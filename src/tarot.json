@@ -1,0 +1,637 @@
+{
+  "description": "cartas de tarô e informações básicas sobre elas, além de referências às varreduras correspondentes",
+  "cartas": [
+    {
+      "name": "O Louco",
+      "number": "0",
+      "arcano": "Arcano Maior",
+      "naipe": null,
+      "img": "/cards/m00.jpg",
+      "description": "Simboliza novos começos, espontaneidade e a jornada da inocência. Representa liberdade, aventura e a coragem de seguir o desconhecido."
+    },
+    {
+      "name": "O Mago",
+      "number": "1",
+      "arcano": "Arcano Maior",
+      "naipe": null,
+      "img": "/cards/m01.jpg",
+      "description": "Representa manifestação, poder pessoal e habilidade para transformar ideias em realidade. Simboliza criatividade, recursos e potencial ilimitado."
+    },
+    {
+      "name": "A Sacerdotisa",
+      "number": "2",
+      "arcano": "Arcano Maior",
+      "naipe": null,
+      "img": "/cards/m02.jpg",
+      "description": "Conhecimento intuitivo, mistérios ocultos e sabedoria interior. Encoraja a confiar na intuição e explorar o subconsciente."
+    },
+    {
+      "name": "A Imperatriz",
+      "number": "3",
+      "arcano": "Arcano Maior",
+      "naipe": null,
+      "img": "/cards/m03.jpg",
+      "description": "Fertilidade, abundância e conexão com a natureza. Representa criatividade, nutrição e o poder feminino em sua plenitude."
+    },
+    {
+      "name": "O Imperador",
+      "number": "4",
+      "arcano": "Arcano Maior",
+      "naipe": null,
+      "img": "/cards/m04.jpg",
+      "description": "Autoridade, estrutura e ordem estabelecida. Simboliza liderança, disciplina e a manifestação de objetivos através do controle."
+    },
+    {
+      "name": "O Hierofante",
+      "number": "5",
+      "arcano": "Arcano Maior",
+      "naipe": null,
+      "img": "/cards/m05.jpg",
+      "description": "Tradição, instituições e conhecimento espiritual. Representa ensinamentos convencionais, ritos de passagem e orientação moral."
+    },
+    {
+      "name": "Os Enamorados",
+      "number": "6",
+      "arcano": "Arcano Maior",
+      "naipe": null,
+      "img": "/cards/m06.jpg",
+      "description": "Amor, harmonia e escolhas alinhadas com valores profundos. Simboliza conexões emocionais e decisões baseadas no coração."
+    },
+    {
+      "name": "A Carruagem",
+      "number": "7",
+      "arcano": "Arcano Maior",
+      "naipe": null,
+      "img": "/cards/m07.jpg",
+      "description": "Determinação, controle e vitória através da vontade. Representa superação de obstáculos e progresso com foco absoluto."
+    },
+    {
+      "name": "A Força",
+      "number": "8",
+      "arcano": "Arcano Maior",
+      "naipe": null,
+      "img": "/cards/m08.jpg",
+      "description": "Coragem interior, compaixão e domínio emocional. Simboliza o equilíbrio entre instinto e razão."
+    },
+    {
+      "name": "O Eremita",
+      "number": "9",
+      "arcano": "Arcano Maior",
+      "naipe": null,
+      "img": "/cards/m09.jpg",
+      "description": "Introspecção, sabedoria adquirida com a experiência e busca por orientação interior. Encoraja pausas para reflexão."
+    },
+    {
+      "name": "A Roda da Fortuna",
+      "number": "10",
+      "arcano": "Arcano Maior",
+      "naipe": null,
+      "img": "/cards/m10.jpg",
+      "description": "Ciclos de mudança, destino e eventos além do controle humano. Simboliza a natureza mutável da vida."
+    },
+    {
+      "name": "A Justiça",
+      "number": "11",
+      "arcano": "Arcano Maior",
+      "naipe": null,
+      "img": "/cards/m11.jpg",
+      "description": "Equilíbrio, verdade e responsabilidade pelas próprias ações. Representa decisões imparciais e karma."
+    },
+    {
+      "name": "O Enforcado",
+      "number": "12",
+      "arcano": "Arcano Maior",
+      "naipe": null,
+      "img": "/cards/m12.jpg",
+      "description": "Mudança de perspectiva, sacrifício temporário e aceitação. Encoraja ver situações sob novos ângulos."
+    },
+    {
+      "name": "A Morte",
+      "number": "13",
+      "arcano": "Arcano Maior",
+      "naipe": null,
+      "img": "/cards/m13.jpg",
+      "description": "Transformação radical, fim de ciclos e renovação necessária. Simboliza mudanças inevitáveis e libertação."
+    },
+    {
+      "name": "A Temperança",
+      "number": "14",
+      "arcano": "Arcano Maior",
+      "naipe": null,
+      "img": "/cards/m14.jpg",
+      "description": "Equilíbrio, moderação e integração de opostos. Representa cura através da harmonia e paciência."
+    },
+    {
+      "name": "O Diabo",
+      "number": "15",
+      "arcano": "Arcano Maior",
+      "naipe": null,
+      "img": "/cards/m15.jpg",
+      "description": "Ilusões, vícios e limitações autoimpostas. Adverte sobre apegos materiais e medos que aprisionam."
+    },
+    {
+      "name": "A Torre",
+      "number": "16",
+      "arcano": "Arcano Maior",
+      "naipe": null,
+      "img": "/cards/m16.jpg",
+      "description": "Mudanças bruscas, colapso de estruturas falsas e revelações disruptivas. Simboliza libertação através do caos."
+    },
+    {
+      "name": "A Estrela",
+      "number": "17",
+      "arcano": "Arcano Maior",
+      "naipe": null,
+      "img": "/cards/m17.jpg",
+      "description": "Esperança, cura espiritual e conexão com o divino. Representa fé no futuro e renovação energética."
+    },
+    {
+      "name": "A Lua",
+      "number": "18",
+      "arcano": "Arcano Maior",
+      "naipe": null,
+      "img": "/cards/m18.jpg",
+      "description": "Intuição, ilusão e confronto com medos subconscientes. Adverte sobre enganos e encoraja autoconhecimento."
+    },
+    {
+      "name": "O Sol",
+      "number": "19",
+      "arcano": "Arcano Maior",
+      "naipe": null,
+      "img": "/cards/m19.jpg",
+      "description": "Vitalidade, sucesso e alegria genuína. Simboliza clareza, otimismo e realização plena."
+    },
+    {
+      "name": "O Julgamento",
+      "number": "20",
+      "arcano": "Arcano Maior",
+      "naipe": null,
+      "img": "/cards/m20.jpg",
+      "description": "Renascimento, chamado interior e avaliação de propósito existencial. Representa despertar para uma nova fase."
+    },
+    {
+      "name": "O Mundo",
+      "number": "21",
+      "arcano": "Arcano Maior",
+      "naipe": null,
+      "img": "/cards/m21.jpg",
+      "description": "Completude, realização de ciclos e integração universal. Simboliza sucesso total e harmonia cósmica."
+    },
+    {
+      "name": "Ás de Copas",
+      "number": "1",
+      "arcano": "Arcano Menor",
+      "naipe": "Copas",
+      "img": "/cards/c01.jpg",
+      "description": "Novos começos emocionais, amor incondicional e conexão espiritual. Simboliza abertura para sentimentos profundos."
+    },
+    {
+      "name": "Dois de Copas",
+      "number": "2",
+      "arcano": "Arcano Menor",
+      "naipe": "Copas",
+      "img": "/cards/c02.jpg",
+      "description": "União harmoniosa, parcerias afetivas e troca emocional equilibrada. Representa conexões sinceras e reciprocidade."
+    },
+    {
+      "name": "Três de Copas",
+      "number": "3",
+      "arcano": "Arcano Menor",
+      "naipe": "Copas",
+      "img": "/cards/c03.jpg",
+      "description": "Celebração, amizade e colaboração. Simboliza momentos de alegria compartilhada e apoio mútuo."
+    },
+    {
+      "name": "Quatro de Copas",
+      "number": "4",
+      "arcano": "Arcano Menor",
+      "naipe": "Copas",
+      "img": "/cards/c04.jpg",
+      "description": "Apatia emocional, oportunidades negligenciadas e necessidade de introspecção. Adverte contra a estagnação afetiva."
+    },
+    {
+      "name": "Cinco de Copas",
+      "number": "5",
+      "arcano": "Arcano Menor",
+      "naipe": "Copas",
+      "img": "/cards/c05.jpg",
+      "description": "Perda, luto emocional e foco no que falta. Encoraja reconhecer o que ainda resta para superar dificuldades."
+    },
+    {
+      "name": "Seis de Copas",
+      "number": "6",
+      "arcano": "Arcano Menor",
+      "naipe": "Copas",
+      "img": "/cards/c06.jpg",
+      "description": "Nostalgia, inocência recuperada e conexões do passado. Simboliza cura através de memórias positivas."
+    },
+    {
+      "name": "Sete de Copas",
+      "number": "7",
+      "arcano": "Arcano Menor",
+      "naipe": "Copas",
+      "img": "/cards/c07.jpg",
+      "description": "Ilusões, escolhas indecisas e fantasias desconectadas da realidade. Adverte sobre sonhos irrealistas."
+    },
+    {
+      "name": "Oito de Copas",
+      "number": "8",
+      "arcano": "Arcano Menor",
+      "naipe": "Copas",
+      "img": "/cards/c08.jpg",
+      "description": "Abandono emocional, busca por significado mais profundo e coragem para seguir em frente."
+    },
+    {
+      "name": "Nove de Copas",
+      "number": "9",
+      "arcano": "Arcano Menor",
+      "naipe": "Copas",
+      "img": "/cards/c09.jpg",
+      "description": "Satisfação emocional, desejos realizados e gratidão. Conhecida como 'a carta dos desejos concedidos'."
+    },
+    {
+      "name": "Dez de Copas",
+      "number": "10",
+      "arcano": "Arcano Menor",
+      "naipe": "Copas",
+      "img": "/cards/c10.jpg",
+      "description": "Harmonia familiar, felicidade plena e realização emocional completa. Simboliza o ideal de vida amorosa."
+    },
+    {
+      "name": "Pajem de Copas",
+      "number": "11",
+      "arcano": "Arcano Menor",
+      "naipe": "Copas",
+      "img": "/cards/c11.jpg",
+      "description": "Sensibilidade artística, notícias afetivas e abertura para novas experiências emocionais."
+    },
+    {
+      "name": "Cavaleiro de Copas",
+      "number": "12",
+      "arcano": "Arcano Menor",
+      "naipe": "Copas",
+      "img": "/cards/c12.jpg",
+      "description": "Romantismo idealista, busca por conexões profundas e entrega emocional intensa, por vezes ingênua."
+    },
+    {
+      "name": "Rainha de Copas",
+      "number": "13",
+      "arcano": "Arcano Menor",
+      "naipe": "Copas",
+      "img": "/cards/c13.jpg",
+      "description": "Sabedoria emocional, empatia profunda e capacidade de nutrir relacionamentos. Representa maturidade afetiva."
+    },
+    {
+      "name": "Rei de Copas",
+      "number": "14",
+      "arcano": "Arcano Menor",
+      "naipe": "Copas",
+      "img": "/cards/c14.jpg",
+      "description": "Controle emocional equilibrado, liderança compassiva e diplomacia nas relações humanas."
+    },
+    {
+      "name": "Ás de Espadas",
+      "number": "1",
+      "arcano": "Arcano Menor",
+      "naipe": "Espadas",
+      "img": "/cards/s01.jpg",
+      "description": "Clareza mental, verdades reveladas e poder intelectual. Simboliza cortar ilusões com objetividade."
+    },
+    {
+      "name": "Dois de Espadas",
+      "number": "2",
+      "arcano": "Arcano Menor",
+      "naipe": "Espadas",
+      "img": "/cards/s02.jpg",
+      "description": "Impasse mental, decisões adiadas e necessidade de enfrentar verdades desconfortáveis."
+    },
+    {
+      "name": "Três de Espadas",
+      "number": "3",
+      "arcano": "Arcano Menor",
+      "naipe": "Espadas",
+      "img": "/cards/s03.jpg",
+      "description": "Dor emocional, traição e coração partido. Encoraja liberação da mágoa para cura posterior."
+    },
+    {
+      "name": "Quatro de Espadas",
+      "number": "4",
+      "arcano": "Arcano Menor",
+      "naipe": "Espadas",
+      "img": "/cards/s04.jpg",
+      "description": "Recuperação mental, pausa necessária e período de reflexão após conflitos."
+    },
+    {
+      "name": "Cinco de Espadas",
+      "number": "5",
+      "arcano": "Arcano Menor",
+      "naipe": "Espadas",
+      "img": "/cards/s05.jpg",
+      "description": "Conflito destrutivo, vitória vazia e necessidade de escolher batalhas com sabedoria."
+    },
+    {
+      "name": "Seis de Espadas",
+      "number": "6",
+      "arcano": "Arcano Menor",
+      "naipe": "Espadas",
+      "img": "/cards/s06.jpg",
+      "description": "Transição mental, superação de dificuldades e jornada em busca de paz interior."
+    },
+    {
+      "name": "Sete de Espadas",
+      "number": "7",
+      "arcano": "Arcano Menor",
+      "naipe": "Espadas",
+      "img": "/cards/s07.jpg",
+      "description": "Estratégia questionável, segredos e risco de traição. Adverte sobre ações sorrateiras."
+    },
+    {
+      "name": "Oito de Espadas",
+      "number": "8",
+      "arcano": "Arcano Menor",
+      "naipe": "Espadas",
+      "img": "/cards/s08.jpg",
+      "description": "Autolimitação mental, sentimento de impotência e necessidade de enxergar saídas."
+    },
+    {
+      "name": "Nove de Espadas",
+      "number": "9",
+      "arcano": "Arcano Menor",
+      "naipe": "Espadas",
+      "img": "/cards/s09.jpg",
+      "description": "Ansiedade noturna, culpa paralisante e medos irracionais. Encoraja buscar apoio."
+    },
+    {
+      "name": "Dez de Espadas",
+      "number": "10",
+      "arcano": "Arcano Menor",
+      "naipe": "Espadas",
+      "img": "/cards/s10.jpg",
+      "description": "Fim doloroso, crise final e necessidade de aceitação para recomeçar."
+    },
+    {
+      "name": "Pajem de Espadas",
+      "number": "11",
+      "arcano": "Arcano Menor",
+      "naipe": "Espadas",
+      "img": "/cards/s11.jpg",
+      "description": "Mente inquisitiva, comunicação direta e busca por verdades através da análise crítica."
+    },
+    {
+      "name": "Cavaleiro de Espadas",
+      "number": "12",
+      "arcano": "Arcano Menor",
+      "naipe": "Espadas",
+      "img": "/cards/s12.jpg",
+      "description": "Ação intelectual impetuosa, determinação implacável e risco de táticas agressivas."
+    },
+    
+    {
+        "name": "Rainha de Espadas",
+        "number": "13",
+        "arcano": "Arcanos Menores",
+        "suit": "Espadas",
+        "img": "/cards/s13.jpg",
+        "description": "A Rainha de Espadas representa inteligência, independência e clareza de pensamento. Ela é uma figura perspicaz, que valoriza a verdade e toma decisões com lógica e imparcialidade."
+    },
+    {
+        "name": "Rei de Espadas",
+        "number": "14",
+        "arcano": "Arcanos Menores",
+        "suit": "Espadas",
+        "img": "/cards/s14.jpg",
+        "description": "O Rei de Espadas simboliza autoridade, disciplina e julgamento imparcial. Ele usa a lógica e o intelecto para tomar decisões justas e equilibradas."
+    },
+    {
+        "name": "Ás de Paus",
+        "number": "1",
+        "arcano": "Arcanos Menores",
+        "suit": "Paus",
+        "img": "/cards/w01.jpg",
+        "description": "O Ás de Paus representa novos começos, inspiração e oportunidades criativas. É um símbolo de energia e motivação para iniciar algo novo."
+    },
+    {
+        "name": "Dois de Paus",
+        "number": "2",
+        "arcano": "Arcanos Menores",
+        "suit": "Paus",
+        "img": "/cards/w02.jpg",
+        "description": "O Dois de Paus sugere planejamento e visão estratégica. Representa a necessidade de avaliar possibilidades antes de tomar uma grande decisão."
+    },
+    {
+        "name": "Três de Paus",
+        "number": "3",
+        "arcano": "Arcanos Menores",
+        "suit": "Paus",
+        "img": "/cards/w03.jpg",
+        "description": "O Três de Paus simboliza expansão, crescimento e a concretização de planos. Indica que esforços iniciais começam a dar frutos."
+    },
+    {
+        "name": "Quatro de Paus",
+        "number": "4",
+        "arcano": "Arcanos Menores",
+        "suit": "Paus",
+        "img": "/cards/w04.jpg",
+        "description": "O Quatro de Paus representa celebração, harmonia e estabilidade. É um sinal de conquistas e momentos felizes compartilhados com os outros."
+    },
+    {
+        "name": "Cinco de Paus",
+        "number": "5",
+        "arcano": "Arcanos Menores",
+        "suit": "Paus",
+        "img": "/cards/w05.jpg",
+        "description": "O Cinco de Paus sugere desafios, competição e conflitos. Representa a necessidade de superar obstáculos para alcançar um objetivo."
+    },
+    {
+        "name": "Seis de Paus",
+        "number": "6",
+        "arcano": "Arcanos Menores",
+        "suit": "Paus",
+        "img": "/cards/w06.jpg",
+        "description": "O Seis de Paus simboliza reconhecimento e sucesso. Indica vitória após esforço e a valorização das conquistas alcançadas."
+    },
+    {
+        "name": "Sete de Paus",
+        "number": "7",
+        "arcano": "Arcanos Menores",
+        "suit": "Paus",
+        "img": "/cards/w07.jpg",
+        "description": "O Sete de Paus representa defesa e persistência. Sugere a necessidade de manter sua posição diante de desafios e adversidades."
+    },
+    {
+        "name": "Oito de Paus",
+        "number": "8",
+        "arcano": "Arcanos Menores",
+        "suit": "Paus",
+        "img": "/cards/w08.jpg",
+        "description": "O Oito de Paus simboliza rapidez, progresso e movimento. Indica uma fase de avanços acelerados e acontecimentos positivos."
+    },
+    {
+        "name": "Nove de Paus",
+        "number": "9",
+        "arcano": "Arcanos Menores",
+        "suit": "Paus",
+        "img": "/cards/w09.jpg",
+        "description": "O Nove de Paus representa resiliência e determinação. Indica a necessidade de continuar persistindo, mesmo diante do cansaço."
+    },
+    {
+        "name": "Dez de Paus",
+        "number": "10",
+        "arcano": "Arcanos Menores",
+        "suit": "Paus",
+        "img": "/cards/w10.jpg",
+        "description": "O Dez de Paus sugere sobrecarga e exaustão. Representa a necessidade de equilibrar responsabilidades para evitar o esgotamento."
+    },
+    {
+        "name": "Rei de Ouros",
+        "number": "14",
+        "arcano": "Arcanos Menores",
+        "suit": "Ouros",
+        "img": "/cards/p14.jpg",
+        "description": "O Rei de Ouros simboliza estabilidade financeira, sucesso e realização. Representa uma pessoa que domina os aspectos materiais da vida."
+    },
+
+
+  
+
+
+        {
+          "name": "Ás de Ouros",
+          "number": "1",
+          "arcano": "Arcano Menor",
+          "naipe": "Ouros",
+          "img": "/cards/p01.jpg",
+          "description": "Novos começos materiais, oportunidades financeiras e prosperidade. Representa potencial para sucesso e estabilidade."
+        },
+        {
+          "name": "Dois de Ouros",
+          "number": "2",
+          "arcano": "Arcano Menor",
+          "naipe": "Ouros",
+          "img": "/cards/p02.jpg",
+          "description": "Equilíbrio, adaptação e administração eficiente dos recursos. Representa a necessidade de flexibilidade diante de desafios financeiros."
+        },
+        {
+          "name": "Três de Ouros",
+          "number": "3",
+          "arcano": "Arcano Menor",
+          "naipe": "Ouros",
+          "img": "/cards/p03.jpg",
+          "description": "Colaboração, aprendizado e trabalho em equipe. Indica reconhecimento profissional e crescimento através da cooperação."
+        },
+        {
+          "name": "Quatro de Ouros",
+          "number": "4",
+          "arcano": "Arcano Menor",
+          "naipe": "Ouros",
+          "img": "/cards/p04.jpg",
+          "description": "Apego material, segurança financeira e medo de perdas. Representa a necessidade de encontrar um equilíbrio entre guardar e compartilhar."
+        },
+        {
+          "name": "Cinco de Ouros",
+          "number": "5",
+          "arcano": "Arcano Menor",
+          "naipe": "Ouros",
+          "img": "/cards/p05.jpg",
+          "description": "Dificuldades financeiras, perda e adversidade. Encoraja buscar apoio e lembrar que desafios são temporários."
+        },
+        {
+          "name": "Seis de Ouros",
+          "number": "6",
+          "arcano": "Arcano Menor",
+          "naipe": "Ouros",
+          "img": "/cards/p06.jpg",
+          "description": "Generosidade, troca equilibrada e caridade. Representa a importância de ajudar os outros e também saber receber."
+        },
+        {
+          "name": "Sete de Ouros",
+          "number": "7",
+          "arcano": "Arcano Menor",
+          "naipe": "Ouros",
+          "img": "/cards/p07.jpg",
+          "description": "Paciência, crescimento sustentável e investimento a longo prazo. Indica a necessidade de perseverança para colher frutos."
+        },
+        {
+          "name": "Oito de Ouros",
+          "number": "8",
+          "arcano": "Arcano Menor",
+          "naipe": "Ouros",
+          "img": "/cards/p08.jpg",
+          "description": "Trabalho duro, aprendizado e aperfeiçoamento. Representa a dedicação para melhorar habilidades e avançar na carreira."
+        },
+        {
+          "name": "Nove de Ouros",
+          "number": "9",
+          "arcano": "Arcano Menor",
+          "naipe": "Ouros",
+          "img": "/cards/p09.jpg",
+          "description": "Independência, sucesso material e auto-suficiência. Indica uma fase de abundância e realização pessoal."
+        },
+        {
+          "name": "Dez de Ouros",
+          "number": "10",
+          "arcano": "Arcano Menor",
+          "naipe": "Ouros",
+          "img": "/cards/p10.jpg",
+          "description": "Segurança financeira, estabilidade familiar e legado. Representa herança e realizações duradouras."
+        },
+        {
+          "name": "Pajem de Ouros",
+          "number": "11",
+          "arcano": "Arcano Menor",
+          "naipe": "Ouros",
+          "img": "/cards/p11.jpg",
+          "description": "Novas oportunidades, aprendizado e desenvolvimento. Indica uma fase de crescimento profissional e educacional."
+        },
+        {
+          "name": "Cavaleiro de Ouros",
+          "number": "12",
+          "arcano": "Arcano Menor",
+          "naipe": "Ouros",
+          "img": "/cards/p12.jpg",
+          "description": "Determinação, responsabilidade e progresso constante. Representa trabalho metódico e confiança no sucesso."
+        },
+        {
+          "name": "Rainha de Ouros",
+          "number": "13",
+          "arcano": "Arcano Menor",
+          "naipe": "Ouros",
+          "img": "/cards/p13.jpg",
+          "description": "Praticidade, generosidade e prosperidade. Representa estabilidade material e habilidades para cuidar dos outros."
+        },
+        {
+          "name": "Rei de Paus",
+          "number": "14",
+          "arcano": "Arcano Menor",
+          "naipe": "Paus",
+          "img": "/cards/w14.jpg",
+          "description": "Liderança, visão e carisma. Representa um indivíduo com grande poder de inspiração e capacidade de concretizar ideias."
+        },
+        {
+          "name": "Rainha de Paus",
+          "number": "13",
+          "arcano": "Arcano Menor",
+          "naipe": "Paus",
+          "img": "/cards/w13.jpg",
+          "description": "Confiança, paixão e criatividade. Simboliza uma pessoa determinada e inspiradora, cheia de energia."
+        },
+        {
+          "name": "Cavaleiro de Paus",
+          "number": "12",
+          "arcano": "Arcano Menor",
+          "naipe": "Paus",
+          "img": "/cards/w12.jpg",
+          "description": "Aventura, energia e entusiasmo. Representa uma fase de exploração e busca por novas experiências."
+        },
+        {
+          "name": "Pajem de Paus",
+          "number": "11",
+          "arcano": "Arcano Menor",
+          "naipe": "Paus",
+          "img": "/cards/w11.jpg",
+          "description": "Curiosidade, descobertas e criatividade. Indica novos começos e entusiasmo para aprender."
+        }
+
+
+]
+}
