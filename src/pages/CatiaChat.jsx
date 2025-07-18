@@ -110,18 +110,20 @@ export default function CatiaChat() {
       <Header user={user} creditos={creditos} />
       <div className="flex flex-col items-center w-full">
         <div className="flex flex-col w-full flex-1 h-full relative">
-          <div className="flex flex-wrap gap-2 px-4 pt-2 pb-1 justify-center sticky top-0 z-10 bg-gradient-to-br from-purple-100 to-blue-100/80">
-            {sugestoes.map((s, i) => (
-              <button
-                key={i}
-                onClick={() => enviarMensagem(null, s)}
-                className={`px-3 py-2 rounded-xl bg-white/80 text-purple-700 font-medium text-sm shadow hover:bg-purple-100 transition border border-purple-200 ${isTyping ? 'opacity-50 cursor-not-allowed' : ''}`}
-                disabled={isTyping}
-              >
-                {s}
-              </button>
-            ))}
-          </div>
+          {mensagens.length === 1 && (
+            <div className="flex flex-wrap gap-2 px-4 pt-2 pb-1 justify-center sticky top-0 z-10 bg-gradient-to-br from-purple-100 to-blue-100/80">
+              {sugestoes.map((s, i) => (
+                <button
+                  key={i}
+                  onClick={() => enviarMensagem(null, s)}
+                  className={`px-3 py-2 rounded-xl bg-white/80 text-purple-700 font-medium text-sm shadow hover:bg-purple-100 transition border border-purple-200 ${isTyping ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  disabled={isTyping}
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
+          )}
 
           <div
             ref={chatRef}
