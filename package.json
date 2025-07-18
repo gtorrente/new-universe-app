@@ -11,6 +11,8 @@
   },
   "dependencies": {
     "astronomia": "^4.1.1",
+    "astronomy-engine": "^2.1.19",
+    "date-fns": "^4.1.0",
     "firebase": "^11.10.0",
     "framer-motion": "^12.23.3",
     "places-autocomplete-js": "^1.1.1",
