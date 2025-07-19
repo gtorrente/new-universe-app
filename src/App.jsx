@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, useLocation } from 'react-router-dom'
 import ProtectedRoute from './components/ProtectedRoute'
 
 import Home from './pages/Home'
@@ -14,6 +14,8 @@ import Diario from './pages/Diario';
 import BottomNav from './components/BottomNav'
 
 export default function App() {
+  const location = useLocation();
+  const hideNav = location.pathname === "/login";
   return (
     <div className="min-h-screen flex flex-col bg-gray-50 text-gray-900">
       {/* Conteúdo das páginas */}
@@ -87,7 +89,7 @@ export default function App() {
         </Routes>
       </main>
       {/* Menu inferior fixo */}
-      <BottomNav />
+      {!hideNav && <BottomNav />}
     </div>
   )
 }

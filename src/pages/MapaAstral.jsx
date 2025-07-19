@@ -231,7 +231,7 @@ export default function MapaAstral() {
     return format(data, "dd/MM/yyyy 'às' HH:mm", { locale: ptBR });
   }
 
-  return (
+    return (
     <div className="min-h-screen bg-gradient-to-br from-purple-100 to-blue-100">
       <Header user={user} creditos={creditos} />
       <div className="max-w-md mx-auto p-4">
@@ -505,4 +505,4 @@ export default function MapaAstral() {
       </div>
     </div>
   );
-}
+  }

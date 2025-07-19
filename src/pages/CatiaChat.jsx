@@ -57,15 +57,30 @@ export default function CatiaChat() {
     const texto = textoSugestao !== undefined ? textoSugestao : input.trim();
     if (!texto) return;
 
+    // Bloqueia envio se não estiver autenticado
+    if (!user?.uid) {
+      alert("Faça login para usar o chat!");
+      return;
+    }
+
     setMensagens(msgs => [...msgs, { autor: "usuario", texto }]);
     setInput("");
     setIsTyping(true); // Inicia indicador de digitação
+
+    // Log para depuração
+    console.log("Enviando para N8N:", {
+      pergunta: texto,
+      userId: user?.uid
+    });
 
     try {
       const response = await fetch(N8N_WEBHOOK_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ pergunta: texto })
+        body: JSON.stringify({
+          pergunta: texto,
+          userId: user?.uid || "anonimo"
+        })
       });
 
       console.log("Status:", response.status);
@@ -85,16 +100,36 @@ export default function CatiaChat() {
         setIsTyping(false); // Para indicador em caso de erro
         return;
       }
-
-      setMensagens(msgs => [
-        ...msgs,
-        { autor: "catia", texto: data.message?.content || "Desculpe, não consegui responder agora." }
-      ]);
-      setIsTyping(false); // Para indicador ao receber resposta
-      // Vibração ao receber resposta
-      if ("vibrate" in navigator) {
-        navigator.vibrate(50);
+         // ✅ Aqui está o que faltava
+    if (data && data.output) {
+        setMensagens(msgs => [
+          ...msgs,
+          { autor: "catia", texto: data.output }
+        ]);
+        setIsTyping(false); // Corrige o loop da animação
+        // Vibração ao receber resposta
+        if ("vibrate" in navigator) {
+          navigator.vibrate(50);
+        }
+      } else {
+        setMensagens(msgs => [
+          ...msgs,
+          { autor: "catia", texto: "Desculpe, não consegui responder agora." }
+        ]);
+        setIsTyping(false); // Corrige o loop da animação
       }
+
+
+
+    //   setMensagens(msgs => [
+    //     ...msgs,
+    //     { autor: "catia", texto: data.message?.content || "Desculpe, não consegui responder agora." }
+    //   ]);
+    //   setIsTyping(false); // Para indicador ao receber resposta
+    //   // Vibração ao receber resposta
+    //   if ("vibrate" in navigator) {
+    //     navigator.vibrate(50);
+    //   }
     } catch (err) {
       console.error("Erro no fetch:", err);
       setMensagens(msgs => [
