@@ -107,7 +107,8 @@ function CidadeAutocomplete({ value, onChange, onSelect }) {
       value={value}
       onChange={e => {
         onChange(e.target.value);
-        if (onSelect) onSelect(null); // Limpa coordenadas se o usuário digitar manualmente
+        // Só limpa coordenadas se o usuário realmente digitou (não quando o Google preenche)
+        if (onSelect && e.nativeEvent.inputType) onSelect(null);
       }}
       placeholder={isLoading ? "Carregando..." : "Digite sua cidade..."}
       disabled={isLoading}

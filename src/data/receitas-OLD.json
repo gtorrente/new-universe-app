@@ -1,0 +1,76 @@
+[
+  {
+    "id": "caldos",
+    "titulo": "Caldos e Sopas",
+    "emoji": "🍲",
+    "imagem": "https://images.unsplash.com/photo-1613844237701-8f3664fc2eff?w=600&h=400&fit=crop",
+    "descricao": "Receitas quentinhas para aquecer o coração.",
+    "receitas": [
+      { "id": "sopa-de-abobora", "nome": "Sopa de Abóbora", "imagem": "https://images.unsplash.com/photo-1547592166-23ac45744acd?w=400&h=300&fit=crop", "premium": false },
+      { "id": "caldo-verde", "nome": "Caldo Verde", "imagem": "https://s2-receitas.glbimg.com/aqOjsZdXmga4tk2XilXdTXOZ-tg=/0x0:1366x768/1000x0/smart/filters:strip_icc()/i.s3.glbimg.com/v1/AUTH_1f540e0b94d8437dbbc39d567a1dee68/internal_photos/bs/2024/b/9/le3LrdQTu4r3xZvInLAA/caldo-verde-receita.jpg?w=600&h=400&fit=crop", "premium": true }
+    ]
+  },
+  {
+    "id": "basico",
+    "titulo": "Básico na Cozinha",
+    "emoji": "🍳",
+    "imagem": "https://images.unsplash.com/photo-1536304993881-ff6e9eefa2a6?w=600&h=400&fit=crop",
+    "descricao": "O essencial para quem está começando.",
+    "receitas": [
+      { "id": "arroz-branco", "nome": "Arroz Branco", "imagem": "https://www.lecreuset.com.br/dw/image/v2/BDRT_PRD/on/demandware.static/-/Sites-le-creuset-br-master/default/dwd44ad97f/images/receita-arroz-branco1.png?w=600&h=400&fit=crop", "premium": false, "tempo": "25 min", "dificuldade": "Fácil" },
+      { "id": "feijao-simples", "nome": "Feijão simples", "imagem": "https://comidinhasdochef.com/wp-content/uploads/2016/11/feij%C3%A3o.jpg?w=600&h=400&fit=crop", "premium": false, "tempo": "40 min", "dificuldade": "Fácil" },
+      { "id": "ovo-mexido", "nome": "Ovo Mexido", "imagem": "https://images.unsplash.com/photo-1563690449029-d6e1b8d6003d?w=600&h=400&fit=crop", "premium": false, "tempo": "5 min", "dificuldade": "Fácil" },
+      { "id": "ovo-frito", "nome": "Ovo frito", "imagem": "https://espetinhodesucesso.com/wp-content/uploads/2024/10/Como-fazer-ovo-frito-na-agua.jpg?w=600&h=400&fit=crop", "premium": false, "tempo": "5 min", "dificuldade": "Fácil" },
+      { "id": "macarrao-alho-oleo", "nome": "Macarrão alho e óleo", "imagem": "https://static.itdg.com.br/images/1200-630/b738131b402ba33d58befa56415ba106/324571-original.jpg?w=600&h=400&fit=crop", "premium": false, "tempo": "20 min", "dificuldade": "Fácil" },
+      { "id": "bife-acebolado", "nome": "Bife acebolado", "imagem": "https://cdn.casaeculinaria.com/wp-content/uploads/2024/01/02200541/bife-acebolado.webp?w=600&h=400&fit=crop", "premium": false, "tempo": "25 min", "dificuldade": "Fácil" },
+      { "id": "frango-grelhado", "nome": "Frango grelhado", "imagem": "https://minhasreceitinhas.com.br/wp-content/uploads/2025/03/bife-de-frango-grelhado-730x365.jpeg?w=600&h=400&fit=crop", "premium": false, "tempo": "20 min", "dificuldade": "Fácil" },
+      { "id": "farofa-simples", "nome": "Farofa simples", "imagem": "https://s2-receitas.glbimg.com/TIY_7fKDaUMPuXRCwYs6kqjk0rg=/0x0:1920x1080/984x0/smart/filters:strip_icc()/i.s3.glbimg.com/v1/AUTH_1f540e0b94d8437dbbc39d567a1dee68/internal_photos/bs/2022/y/k/phJx1yS5Gm7ea2NydVUA/farofa.jpg?w=600&h=400&fit=crop", "premium": false, "tempo": "15 min", "dificuldade": "Fácil" },
+      { "id": "pure-de-batata", "nome": "Purê de batata", "imagem": "https://anamariabrogui.com.br/assets/uploads/receitas/fotos/usuario-3101-4a3e8c8ef9b8696304032449b600d8f3.png?w=600&h=400&fit=crop", "premium": false, "tempo": "30 min", "dificuldade": "Fácil" },
+      { "id": "omelete-basica", "nome": "Omelete básica", "imagem": "https://i.ytimg.com/vi/gY4YpCyxV4Q/maxresdefault.jpg?w=600&h=400&fit=crop", "premium": false, "tempo": "10 min", "dificuldade": "Fácil" }
+    ]
+  },
+  {
+    "id": "italianas",
+    "titulo": "Delícias Italianas",
+    "emoji": "🍝",
+    "imagem": "https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?w=600&h=400&fit=crop",
+    "descricao": "Receitas cheias de sabor para adoçar seu dia.",
+    "receitas": [
+      { "id": "lasanha-bolonhesa", "nome": "Lasanha à bolonhesa", "imagem": "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=400&h=300&fit=crop", "premium": false },
+      { "id": "risoto-parmesao", "nome": "Risoto de parmesão", "imagem": "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&h=300&fit=crop", "premium": true }
+    ]
+  },
+  {
+    "id": "festas",
+    "titulo": "Festas e Eventos",
+    "emoji": "🎉",
+    "imagem": "https://images.unsplash.com/photo-1464349095431-e9a21285b5f3?w=600&h=400&fit=crop",
+    "descricao": "Para celebrar com quem você ama.",
+    "receitas": [
+      { "id": "brigadeiro-gourmet", "nome": "Brigadeiro Gourmet", "imagem": "https://images.unsplash.com/photo-1464349095431-e9a21285b5f3?w=400&h=300&fit=crop", "premium": true },
+      { "id": "coxinha-frango", "nome": "Coxinha de Frango", "imagem": "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400&h=300&fit=crop", "premium": false }
+    ]
+  },
+  {
+    "id": "padaria",
+    "titulo": "Receitas da Padaria",
+    "emoji": "🥐",
+    "imagem": "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=600&h=400&fit=crop",
+    "descricao": "Pães e delícias para o café da manhã.",
+    "receitas": [
+      { "id": "pao-de-queijo", "nome": "Pão de Queijo", "imagem": "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400&h=300&fit=crop", "premium": false },
+      { "id": "croissant", "nome": "Croissant", "imagem": "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&h=300&fit=crop", "premium": true }
+    ]
+  },
+  {
+    "id": "fitness",
+    "titulo": "Receitas Fitness",
+    "emoji": "🥗",
+    "imagem": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=600&h=400&fit=crop",
+    "descricao": "Saudáveis e deliciosas para o seu dia a dia.",
+    "receitas": [
+      { "id": "salada-de-quinoa", "nome": "Salada de Quinoa", "imagem": "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&h=300&fit=crop", "premium": false },
+      { "id": "smoothie-verde", "nome": "Smoothie Verde", "imagem": "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400&h=300&fit=crop", "premium": false }
+    ]
+  }
+] 

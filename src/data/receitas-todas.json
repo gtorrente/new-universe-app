@@ -1,0 +1,212 @@
+[
+  {
+    "id": "omelete-de-forno",
+    "nome": "Omelete de Forno",
+    "imagem": "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&h=400&fit=crop",
+    "tempo": "20 min",
+    "dificuldade": "Fácil",
+    "ingredientes": ["2 ovos", "1/2 xíc. de leite", "Sal, pimenta e queijo a gosto"],
+    "preparo": ["Bata os ovos com o leite.", "Tempere a gosto.", "Despeje em uma travessa untada.", "Leve ao forno a 180ºC por 15 min."],
+    "dica": "Adicione tomate picado para um toque especial."
+  },
+  {
+    "id": "sopa-de-abobora",
+    "nome": "Sopa de Abóbora",
+    "imagem": "https://images.unsplash.com/photo-1547592166-23ac45744acd?w=400&h=300&fit=crop",
+    "tempo": "40 min",
+    "dificuldade": "Fácil",
+    "ingredientes": ["500g de abóbora", "1 cebola", "2 dentes de alho", "Sal e pimenta a gosto", "Água"],
+    "preparo": ["Refogue a cebola e o alho.", "Adicione a abóbora e cubra com água.", "Cozinhe até amolecer.", "Bata no liquidificador e tempere."],
+    "dica": "Finalize com cheiro-verde e um fio de azeite."
+  },
+  {
+    "id": "caldo-verde",
+    "nome": "Caldo Verde",
+    "imagem": "https://s2-receitas.glbimg.com/aqOjsZdXmga4tk2XilXdTXOZ-tg=/0x0:1366x768/1000x0/smart/filters:strip_icc()/i.s3.glbimg.com/v1/AUTH_1f540e0b94d8437dbbc39d567a1dee68/internal_photos/bs/2024/b/9/le3LrdQTu4r3xZvInLAA/caldo-verde-receita.jpg?w=600&h=400&fit=crop",
+    "tempo": "50 min",
+    "dificuldade": "Fácil",
+    "ingredientes": ["4 batatas", "1 linguiça calabresa", "Couve", "1 cebola", "2 dentes de alho", "Sal e azeite"],
+    "preparo": ["Cozinhe as batatas e bata no liquidificador.", "Refogue a linguiça, cebola e alho.", "Junte o creme de batata, ferva e adicione a couve."],
+    "dica": "Sirva com pão e um fio de azeite."
+  },
+  {
+    "id": "arroz-branco",
+    "nome": "Arroz Branco",
+    "imagem": "https://www.lecreuset.com.br/dw/image/v2/BDRT_PRD/on/demandware.static/-/Sites-le-creuset-br-master/default/dwd44ad97f/images/receita-arroz-branco1.png?w=600&h=400&fit=crop",
+    "tempo": "25 min",
+    "dificuldade": "Fácil",
+    "ingredientes": ["1 xícara de arroz", "2 xícaras de água", "Sal a gosto"],
+    "preparo": ["Lave o arroz.", "Refogue com alho e cebola.", "Adicione água e sal.", "Cozinhe até secar."],
+    "dica": "Use água quente para acelerar o cozimento."
+  },
+  {
+    "id": "feijao-simples",
+    "nome": "Feijão simples",
+    "imagem": "https://comidinhasdochef.com/wp-content/uploads/2016/11/feij%C3%A3o.jpg?w=600&h=400&fit=crop",
+    "tempo": "40 min",
+    "dificuldade": "Fácil",
+    "ingredientes": ["2 xícaras de feijão", "Água", "Sal", "Alho e cebola"],
+    "preparo": ["Lave o feijão e cozinhe na panela de pressão.", "Refogue alho e cebola, adicione ao feijão.", "Tempere com sal e cozinhe até engrossar."],
+    "dica": "Deixe o feijão de molho para cozinhar mais rápido."
+  },
+  {
+    "id": "ovo-mexido",
+    "nome": "Ovo Mexido",
+    "imagem": "https://images.unsplash.com/photo-1563690449029-d6e1b8d6003d?w=600&h=400&fit=crop",
+    "tempo": "5 min",
+    "dificuldade": "Fácil",
+    "ingredientes": ["2 ovos", "Sal e pimenta a gosto", "Manteiga"],
+    "preparo": ["Bata os ovos com sal e pimenta.", "Derreta a manteiga na frigideira.", "Despeje os ovos e mexa até cozinhar."],
+    "dica": "Mexa sempre em fogo baixo para ovos cremosos."
+  },
+  {
+    "id": "ovo-frito",
+    "nome": "Ovo frito",
+    "imagem": "https://espetinhodesucesso.com/wp-content/uploads/2024/10/Como-fazer-ovo-frito-na-agua.jpg?w=600&h=400&fit=crop",
+    "tempo": "5 min",
+    "dificuldade": "Fácil",
+    "ingredientes": ["1 ovo", "Óleo ou manteiga", "Sal a gosto"],
+    "preparo": ["Aqueça a frigideira com óleo ou manteiga.", "Quebre o ovo e frite até o ponto desejado.", "Tempere com sal."],
+    "dica": "Frite em fogo baixo para gema mole."
+  },
+  {
+    "id": "macarrao-alho-oleo",
+    "nome": "Macarrão alho e óleo",
+    "imagem": "https://static.itdg.com.br/images/1200-630/b738131b402ba33d58befa56415ba106/324571-original.jpg?w=600&h=400&fit=crop",
+    "tempo": "20 min",
+    "dificuldade": "Fácil",
+    "ingredientes": ["200g de macarrão", "3 dentes de alho", "Azeite", "Sal e salsinha"],
+    "preparo": ["Cozinhe o macarrão.", "Doure o alho no azeite.", "Misture o macarrão e finalize com salsinha."],
+    "dica": "Use alho fresco para mais sabor."
+  },
+  {
+    "id": "bife-acebolado",
+    "nome": "Bife acebolado",
+    "imagem": "https://cdn.casaeculinaria.com/wp-content/uploads/2024/01/02200541/bife-acebolado.webp?w=600&h=400&fit=crop",
+    "tempo": "25 min",
+    "dificuldade": "Fácil",
+    "ingredientes": ["4 bifes de carne", "2 cebolas", "Sal e pimenta", "Óleo"],
+    "preparo": ["Tempere os bifes.", "Frite na frigideira.", "Adicione cebola em rodelas e refogue."],
+    "dica": "Deixe a cebola caramelizar para mais sabor."
+  },
+  {
+    "id": "frango-grelhado",
+    "nome": "Frango grelhado",
+    "imagem": "https://minhasreceitinhas.com.br/wp-content/uploads/2025/03/bife-de-frango-grelhado-730x365.jpeg?w=600&h=400&fit=crop",
+    "tempo": "20 min",
+    "dificuldade": "Fácil",
+    "ingredientes": ["2 filés de frango", "Sal, pimenta e limão", "Azeite"],
+    "preparo": ["Tempere o frango.", "Aqueça a grelha e doure os filés dos dois lados."],
+    "dica": "Deixe marinar para mais sabor."
+  },
+  {
+    "id": "farofa-simples",
+    "nome": "Farofa simples",
+    "imagem": "https://s2-receitas.glbimg.com/TIY_7fKDaUMPuXRCwYs6kqjk0rg=/0x0:1920x1080/984x0/smart/filters:strip_icc()/i.s3.glbimg.com/v1/AUTH_1f540e0b94d8437dbbc39d567a1dee68/internal_photos/bs/2022/y/k/phJx1yS5Gm7ea2NydVUA/farofa.jpg?w=600&h=400&fit=crop",
+    "tempo": "15 min",
+    "dificuldade": "Fácil",
+    "ingredientes": ["2 xícaras de farinha de mandioca", "1 cebola", "Manteiga", "Sal"],
+    "preparo": ["Refogue a cebola na manteiga.", "Adicione a farinha e mexa até dourar.", "Tempere com sal."],
+    "dica": "Adicione bacon para uma farofa especial."
+  },
+  {
+    "id": "pure-de-batata",
+    "nome": "Purê de batata",
+    "imagem": "https://anamariabrogui.com.br/assets/uploads/receitas/fotos/usuario-3101-4a3e8c8ef9b8696304032449b600d8f3.png?w=600&h=400&fit=crop",
+    "tempo": "30 min",
+    "dificuldade": "Fácil",
+    "ingredientes": ["4 batatas", "Leite", "Manteiga", "Sal"],
+    "preparo": ["Cozinhe as batatas e amasse.", "Misture leite, manteiga e sal.", "Mexa até ficar cremoso."],
+    "dica": "Finalize com noz-moscada ralada."
+  },
+  {
+    "id": "omelete-basica",
+    "nome": "Omelete básica",
+    "imagem": "https://i.ytimg.com/vi/gY4YpCyxV4Q/maxresdefault.jpg?w=600&h=400&fit=crop",
+    "tempo": "10 min",
+    "dificuldade": "Fácil",
+    "ingredientes": ["2 ovos", "Sal e pimenta a gosto", "Queijo ralado"],
+    "preparo": ["Bata os ovos com sal e pimenta.", "Aqueça a frigideira e despeje os ovos.", "Adicione queijo e dobre a omelete.", "Cozinhe até dourar."],
+    "dica": "Adicione ervas frescas para mais sabor."
+  },
+  {
+    "id": "lasanha-bolonhesa",
+    "nome": "Lasanha à bolonhesa",
+    "imagem": "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=400&h=300&fit=crop",
+    "tempo": "1h",
+    "dificuldade": "Média",
+    "ingredientes": ["Massa de lasanha", "Molho bolonhesa", "Queijo mussarela", "Presunto"],
+    "preparo": ["Monte camadas de massa, molho, queijo e presunto.", "Repita até acabar os ingredientes.", "Leve ao forno por 40 minutos."],
+    "dica": "Deixe descansar 10 minutos antes de servir."
+  },
+  {
+    "id": "risoto-parmesao",
+    "nome": "Risoto de parmesão",
+    "imagem": "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&h=300&fit=crop",
+    "tempo": "40 min",
+    "dificuldade": "Média",
+    "ingredientes": ["Arroz arbório", "Caldo de legumes", "Queijo parmesão", "Manteiga"],
+    "preparo": ["Refogue o arroz na manteiga.", "Adicione caldo aos poucos, mexendo sempre.", "Finalize com parmesão."],
+    "dica": "Mexa sempre para um risoto cremoso."
+  },
+  {
+    "id": "brigadeiro-gourmet",
+    "nome": "Brigadeiro Gourmet",
+    "imagem": "https://images.unsplash.com/photo-1464349095431-e9a21285b5f3?w=400&h=300&fit=crop",
+    "tempo": "30 min",
+    "dificuldade": "Fácil",
+    "ingredientes": ["1 lata de leite condensado", "2 colheres de cacau em pó", "1 colher de manteiga", "Chocolate granulado"],
+    "preparo": ["Misture leite condensado, cacau e manteiga.", "Cozinhe até desgrudar do fundo.", "Enrole e passe no granulado."],
+    "dica": "Use chocolate em pó para sabor mais intenso."
+  },
+  {
+    "id": "coxinha-frango",
+    "nome": "Coxinha de Frango",
+    "imagem": "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400&h=300&fit=crop",
+    "tempo": "1h",
+    "dificuldade": "Média",
+    "ingredientes": ["500g de frango desfiado", "Massa para coxinha", "Farinha de rosca", "Óleo para fritar"],
+    "preparo": ["Prepare a massa e o recheio de frango.", "Modele as coxinhas, empane e frite."],
+    "dica": "Deixe escorrer em papel-toalha para ficar sequinha."
+  },
+  {
+    "id": "pao-de-queijo",
+    "nome": "Pão de Queijo",
+    "imagem": "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400&h=300&fit=crop",
+    "tempo": "40 min",
+    "dificuldade": "Fácil",
+    "ingredientes": ["500g de polvilho doce", "250ml de leite", "2 ovos", "Queijo meia cura ralado"],
+    "preparo": ["Misture todos os ingredientes.", "Modele bolinhas e asse em forno pré-aquecido."],
+    "dica": "Sirva quentinho para ficar mais gostoso."
+  },
+  {
+    "id": "croissant",
+    "nome": "Croissant",
+    "imagem": "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&h=300&fit=crop",
+    "tempo": "2h",
+    "dificuldade": "Difícil",
+    "ingredientes": ["500g de farinha de trigo", "300g de manteiga", "250ml de leite", "Fermento biológico"],
+    "preparo": ["Prepare a massa folhada.", "Abra, dobre e recheie.", "Asse até dourar."],
+    "dica": "Use manteiga gelada para folhar melhor."
+  },
+  {
+    "id": "salada-de-quinoa",
+    "nome": "Salada de Quinoa",
+    "imagem": "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&h=300&fit=crop",
+    "tempo": "25 min",
+    "dificuldade": "Fácil",
+    "ingredientes": ["1 xícara de quinoa", "Tomate", "Pepino", "Azeite e limão"],
+    "preparo": ["Cozinhe a quinoa.", "Misture com legumes picados.", "Tempere com azeite e limão."],
+    "dica": "Sirva gelada para refrescar."
+  },
+  {
+    "id": "smoothie-verde",
+    "nome": "Smoothie Verde",
+    "imagem": "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400&h=300&fit=crop",
+    "tempo": "10 min",
+    "dificuldade": "Fácil",
+    "ingredientes": ["1 banana", "1 folha de couve", "1 maçã", "Água ou água de coco"],
+    "preparo": ["Bata todos os ingredientes no liquidificador.", "Sirva gelado."],
+    "dica": "Adicione gengibre para um toque especial."
+  }
+] 

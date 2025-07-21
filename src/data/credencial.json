@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "tarot-universo-catia",
+  "private_key_id": "d5a885d0410566776e38eece7901c1a7f536ced7",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQC5k4R15DZzI/Na\n45KkuoRf8CT06WAXmC1ZOac/V81XZfHVkYK5FPGkQggnUy8CJm4n6daGTQFobZUZ\nmy/5lBfjCG9pM628/5gEPNNSFlHEn7Nw6UuTEhglGoKjiWi8So9v/8/mhBYgzjju\nqzn55+qonuN5WBkb7dblrQXTFhTX+RVh/S14GFkwrybjcStnieHrqiAMxiSe72mZ\njnMDtlyF/cAcceBnzeLGznj4CnmhmAyOQoq6FubrV428mo+nX6p/nPoPcp52HpxD\n2vyzmpMAc+X71pdIT78RK7HzU78ngua8lPIXzXe3Re0BWeo81yU/bv6TGs5+8qpk\nm6kbZzYJAgMBAAECggEALaWBvD7bftRduGJIUJEZXQDUklJyQrN5mhwijaPi/Ce1\nBceSPETQ0Eq2tzeQlUqPJ22vCR9ZZI6p0V/Y+96nxn4ta1bdGiNTiN1OTH91cvQm\nXvRflMgrXLsJ3cB/nOsJH68we/7K85xOKDTBYL1hPMNCaDdZi8Njq+B0kZC5pUqw\n1p/NL1QJTCxz+8H/RipA5sSFioerxcxzIK2iYHlqE3kMYIKTmrF8zZb4D68wbiEA\nixp15l1pCvKEGsKkjp6By+YirI1AdfcsJ8HwGo4gvEyOAZf3A6bvp9YPcRYTzVVB\naiOZbBMEn0bSWL656jFq4551RVMBZtYBb8dEbAcJNQKBgQD7vPVbXCNjtm6Eu5sk\nz4QXBoKFqWsrD5wKJvhmdcv48FxNmuUVPsUXWl+68KDX4tx4V5M1REqFvy2XeMCX\nDQ3Iw63ooVK1sTTVXC+tiNlYisMSVD6213hTuHtR3ZIqqm+urcPuWGoMnBI9mV0Z\nJ/Ys1+7HI0U/DfTzEHHSRQ6/FQKBgQC8t8+oa6Ju4Lbi26MUg74bNAbzl8Uh1WtY\niZjUzLYChhXi9sQJXU3V9o7h4IhnGMPhvcL7a25qTl+1jhHXlTF/nfXQ8qNONxze\n/C98b1XuHFdzGhjfnfqiPM+fwIxalc7qlffu47xzOn7fxgwnpvevsLF10MXzNMPj\n7th7wtU4JQKBgQDqWWRIIqRHZUPJiSTKxex/yu2jJK7BrYxj3xeLusmh+5DSJgpx\nFrhAHz/TNcNmdqkr1ssR4XtGu0zkH+OaOurEJXY2hEgNIOTAY0t3T1iWlsc2vvqL\nGFfKCIm1EoHJ+lRx1w35SpGfH4PTmHwUuSDxaiu9ctY59vI7fOmZB/TMaQKBgBPC\ncz3BN1rAsKWENckaGjei9O9gfsWSIRE+JwBxBsWw4G3JRLFuUY4LqN5BskaJM0lZ\noybMEt2SozbRT1DxUCN6mJhuL2crIhy+7wHqbmbmFMn6e4w+cFW4ZEznzkpV0TqC\nxVkAA2VVRJ+Njww/0UNWDt61I2TZq4EcKxKaTdT5AoGBAIPxOQQj1hnm9aGdhZLL\ng4E7k3FC2GDjvSVV2kqUOF+ELlQSb4sYlkiKYrAHeSEKroodW/+Ve47roKsvoTHd\ns9D94jGW0BTpsVHmL9zOUkIWOmAeyu3imaAM5auRSJ77DnAdzJf/P+rA7tJrjdM8\nl35icJ7TFcQKJtMsFPonw7/a\n-----END PRIVATE KEY-----\n",
+  "client_email": "firebase-adminsdk-fbsvc@tarot-universo-catia.iam.gserviceaccount.com",
+  "client_id": "100699005103146191988",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-fbsvc%40tarot-universo-catia.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

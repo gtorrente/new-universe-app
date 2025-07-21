@@ -3,9 +3,11 @@
 
 import { useState, useEffect } from 'react';
 import { TbChefHat, TbLock, TbStar, TbHeart, TbArrowRight } from 'react-icons/tb';
+import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import { auth, db } from '../firebaseConfigFront';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, collection, getDocs } from 'firebase/firestore';
+import receitasData from '../data/receitas.json';
 
 export default function Receitas() {
   // Simulação do estado de assinatura premium
@@ -14,6 +16,8 @@ export default function Receitas() {
   // Estado do usuário autenticado e créditos
   const [user, setUser] = useState(null);
   const [creditos, setCreditos] = useState(0);
+  const [categorias, setCategorias] = useState([]);
+  const [loadingCategorias, setLoadingCategorias] = useState(true);
 
   // Efeito para buscar usuário autenticado e créditos no Firestore
   useEffect(() => {
@@ -31,44 +35,17 @@ export default function Receitas() {
     return () => unsubscribe();
   }, []);
 
-  // Dados das categorias de receitas com informações de premium
-  const categorias = [
-    {
-      id: 1,
-      nome: 'Caldos e Sopas',
-      emoji: '🍲',
-      imagem: 'https://images.unsplash.com/photo-1547592166-23ac45744acd?w=400&h=300&fit=crop',
-      premium: false // Categoria gratuita
-    },
-    {
-      id: 2,
-      nome: 'Básico na Cozinha',
-      emoji: '🍳',
-      imagem: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400&h=300&fit=crop',
-      premium: true // Categoria premium
-    },
-    {
-      id: 3,
-      nome: 'Delícias Italianas',
-      emoji: '🍝',
-      imagem: 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=400&h=300&fit=crop',
-      premium: true // Categoria premium
-    },
-    {
-      id: 4,
-      nome: 'Festas e Eventos',
-      emoji: '🎉',
-      imagem: 'https://images.unsplash.com/photo-1464349095431-e9a21285b5f3?w=400&h=300&fit=crop',
-      premium: true // Categoria premium
-    },
-    {
-      id: 5,
-      nome: 'Receitas da Padaria',
-      emoji: '🥐',
-      imagem: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400&h=300&fit=crop',
-      premium: false // Categoria gratuita
+  // Buscar categorias do Firestore
+  useEffect(() => {
+    async function fetchCategorias() {
+      setLoadingCategorias(true);
+      const querySnapshot = await getDocs(collection(db, 'categorias'));
+      const data = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setCategorias(data);
+      setLoadingCategorias(false);
     }
-  ];
+    fetchCategorias();
+  }, []);
 
   // Dados da receita em destaque (gratuita)
   const receitaDestaque = {
@@ -78,6 +55,8 @@ export default function Receitas() {
     tempo: '30 min',
     dificuldade: 'Fácil'
   };
+
+  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-lavender-50">
@@ -108,54 +87,59 @@ export default function Receitas() {
             Categorias
           </h2>
           {/* Grid responsivo de categorias */}
-          <div className="grid grid-cols-2 gap-4">
-            {categorias.map((categoria) => (
-              <div
-                key={categoria.id}
-                className={`relative group cursor-pointer transition-all duration-300 hover:scale-105 ${
-                  categoria.premium && !isPremium ? 'opacity-75' : ''
-                }`}
-              >
-                <div className="relative overflow-hidden rounded-2xl bg-white shadow-lg hover:shadow-xl transition-shadow duration-300">
-                  {/* Imagem da categoria */}
-                  <div className="relative h-32">
-                    <img
-                      src={categoria.imagem}
-                      alt={categoria.nome}
-                      className="w-full h-full object-cover"
-                    />
-                    {/* Overlay de bloqueio para categorias premium */}
-                    {categoria.premium && !isPremium && (
-                      <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
-                        <div className="bg-white/90 backdrop-blur-sm rounded-full p-2">
-                          <TbLock className="text-purple-600 text-xl" />
+          {loadingCategorias ? (
+            <div className="text-center text-purple-600 py-8">Carregando categorias...</div>
+          ) : (
+            <div className="grid grid-cols-2 gap-4">
+              {categorias.map((categoria) => (
+                <div
+                  key={categoria.id}
+                  className={`relative group cursor-pointer transition-all duration-300 hover:scale-105 ${
+                    categoria.premium && !isPremium ? 'opacity-75' : ''
+                  }`}
+                  onClick={() => navigate(`/receitas/categoria/${categoria.id}`)}
+                >
+                  <div className="relative overflow-hidden rounded-2xl bg-white shadow-lg hover:shadow-xl transition-shadow duration-300">
+                    {/* Imagem da categoria */}
+                    <div className="relative h-32">
+                      <img
+                        src={categoria.imagem}
+                        alt={categoria.titulo}
+                        className="w-full h-full object-cover"
+                      />
+                      {/* Overlay de bloqueio para categorias premium */}
+                      {categoria.premium && !isPremium && (
+                        <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
+                          <div className="bg-white/90 backdrop-blur-sm rounded-full p-2">
+                            <TbLock className="text-purple-600 text-xl" />
+                          </div>
                         </div>
-                      </div>
-                    )}
-                  </div>
-                  {/* Informações da categoria */}
-                  <div className="p-4">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="text-2xl">{categoria.emoji}</span>
-                      {/* Ícone de estrela para categorias premium */}
-                      {categoria.premium && (
-                        <TbStar className="text-yellow-500 text-sm" />
                       )}
                     </div>
-                    <h3 className="font-semibold text-gray-800 text-sm font-neue-bold">
-                      {categoria.nome}
-                    </h3>
-                    {/* Badge Universo+ para categorias premium */}
-                    {categoria.premium && !isPremium && (
-                      <p className="text-xs text-purple-600 mt-1 font-neue">
-                        Universo+
-                      </p>
-                    )}
+                    {/* Informações da categoria */}
+                    <div className="p-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="text-2xl">{categoria.emoji}</span>
+                        {/* Ícone de estrela para categorias premium */}
+                        {categoria.premium && (
+                          <TbStar className="text-yellow-500 text-sm" />
+                        )}
+                      </div>
+                      <h3 className="font-semibold text-gray-800 text-sm font-neue-bold">
+                        {categoria.titulo}
+                      </h3>
+                      {/* Badge Universo+ para categorias premium */}
+                      {categoria.premium && !isPremium && (
+                        <p className="text-xs text-purple-600 mt-1 font-neue">
+                          Universo+
+                        </p>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Seção de Receita em Destaque (Gratuita) */}

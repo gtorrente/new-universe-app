@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom'
-import { FaStar, FaHome, FaBook } from 'react-icons/fa'
+import { FaStar, FaHome, FaBook, FaUser } from 'react-icons/fa'
 import { TbChefHat } from 'react-icons/tb'
 
 const navItem = (path, icon, label) => (
@@ -18,6 +18,7 @@ export default function BottomNav() {
       {navItem('/mapa-astral', <FaStar className="text-lg" />, 'Astros')}
       {navItem('/receitas', <TbChefHat className="text-lg" />, 'Receitas')}
       {navItem('/diario', <FaBook className="text-lg" />, 'Diário')}
+      {navItem('/perfil', <FaUser className="text-lg" />, 'Perfil')}
     </nav>
   )
 }

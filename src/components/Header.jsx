@@ -1,23 +1,17 @@
 import { useState, useRef, useEffect } from "react";
-import { signOut } from "firebase/auth";
-import { auth } from "../firebaseConfigFront";
 import { useNavigate } from "react-router-dom";
 import { FaFire } from "react-icons/fa";
 import { FiBell } from "react-icons/fi";
+import avatarDefault from '../assets/avatar.png';
 
 export default function Header({ user, creditos }) {
-  const [open, setOpen] = useState(false);
   const [openCreditos, setOpenCreditos] = useState(false);
-  const menuRef = useRef(null);
   const creditosRef = useRef(null);
   const navigate = useNavigate();
 
   // Fecha o menu ao clicar fora
   useEffect(() => {
     function handleClickOutside(event) {
-      if (menuRef.current && !menuRef.current.contains(event.target)) {
-        setOpen(false);
-      }
       if (creditosRef.current && !creditosRef.current.contains(event.target)) {
         setOpenCreditos(false);
       }
@@ -27,13 +21,7 @@ export default function Header({ user, creditos }) {
   }, []);
 
   const handleAvatarClick = () => {
-    setOpen((prev) => !prev);
-  };
-
-  const handleLogout = async () => {
-    await signOut(auth);
-    setOpen(false);
-    navigate("/login");
+    navigate('/perfil');
   };
 
   return (
@@ -45,7 +33,7 @@ export default function Header({ user, creditos }) {
           style={{ display: 'inline-block' }}
         >
           <img
-            src={user?.photoURL || "/default.png"}
+            src={user?.photoURL || avatarDefault}
             alt="Avatar"
             className="w-12 h-12 rounded-full bg-white cursor-pointer border-2 border-white"
             onClick={handleAvatarClick}
@@ -55,23 +43,6 @@ export default function Header({ user, creditos }) {
           Olá, {user?.displayName?.split(" ")[0] || "Visitante"}
         </span>
         {/* Popover Menu */}
-        {open && (
-          <div
-            ref={menuRef}
-            className="absolute left-0 top-full mt-2 w-44 bg-gray-900 text-white rounded-xl shadow-lg z-50 p-3 flex flex-col gap-2"
-          >
-            <button className="text-left rounded-lg px-2 py-2 transition hover:bg-gray-800/60" onClick={() => { navigate('/perfil'); setOpen(false); }}>Perfil</button>
-            <button className="text-left rounded-lg px-2 py-2 transition hover:bg-gray-800/60" onClick={() => { navigate('/indique'); setOpen(false); }}>Indique um Amigo</button>
-            <button className="text-left rounded-lg px-2 py-2 transition hover:bg-gray-800/60" onClick={() => { navigate('/contato'); setOpen(false); }}>Fale Conosco</button>
-            <hr className="my-2 border-gray-700" />
-            <button
-              onClick={handleLogout}
-              className="bg-red-600 text-white font-bold py-2 rounded-lg hover:bg-red-700 transition"
-            >
-              Sair
-            </button>
-          </div>
-        )}
       </div>
       {/* Notificações + Créditos */}
       <div className="flex items-center gap-2">

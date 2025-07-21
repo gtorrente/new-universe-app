@@ -1,13 +1,14 @@
 // Página de login do app Universo Catia
 // Permite autenticação via Google e redireciona para Home se já estiver logado
 
-import { signInWithPopup } from "firebase/auth";
+import { signInWithPopup, signInWithEmailAndPassword } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { auth, googleProvider } from "../firebaseConfigFront";
 import { EyeIcon, EyeSlashIcon, EnvelopeIcon, LockClosedIcon } from "@heroicons/react/24/outline";
 import { motion } from "framer-motion";
 import LogoUniversoCatia from "../assets/logo-purple-universo-catia.png"; // ajuste o caminho se necessário
+import { Link } from "react-router-dom";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -30,21 +31,34 @@ export default function Login() {
   const handleLogin = async (e) => {
     e.preventDefault();
     setErro("");
+    if (!email || !senha) {
+      setErro("Preencha todos os campos.");
+      return;
+    }
+    if (!email.includes("@") || !email.includes(".")) {
+      setErro("E-mail inválido.");
+      return;
+    }
+    if (senha.length < 6) {
+      setErro("A senha deve ter pelo menos 6 caracteres.");
+      return;
+    }
     setLoading(true);
-    // Simulação de login com e-mail/senha (substitua pela lógica real se quiser)
-    setTimeout(() => {
-      if (!email || !senha) {
-        setErro("Preencha todos os campos.");
-      } else if (!email.includes("@")) {
-        setErro("E-mail inválido.");
-      } else if (senha.length < 6) {
-        setErro("A senha deve ter pelo menos 6 caracteres.");
+    try {
+      await signInWithEmailAndPassword(auth, email, senha);
+      setErro("");
+      // Redirecionamento automático pelo useEffect
+    } catch (error) {
+      if (error.code === "auth/user-not-found" || error.code === "auth/wrong-password") {
+        setErro("E-mail ou senha incorretos.");
+      } else if (error.code === "auth/too-many-requests") {
+        setErro("Muitas tentativas. Tente novamente mais tarde.");
       } else {
-        setErro("");
-        alert("Login realizado!");
+        setErro("Erro ao fazer login: " + error.message);
       }
+    } finally {
       setLoading(false);
-    }, 800);
+    }
   };
 
   const handleGoogleLogin = async () => {
@@ -141,12 +155,12 @@ export default function Login() {
           {/* Link para criar conta */}
           <div className="text-center text-xs text-gray-600 mt-6">
             Ainda não tem uma conta?{' '}
-            <a href="#" className="text-purple-500 font-medium hover:underline">Crie agora</a>
+            <Link to="/registro" className="text-purple-500 font-medium hover:underline">Crie agora</Link>
           </div>
           <div className="text-center text-xs text-gray-600 mt-2">
             Ao entrar, você concorda com nossos <a href="#" className="text-purple-500 font-medium hover:underline">Termos de Uso</a>
           </div>
-      </form>
+      </form> 
     </div>
   );
 }
