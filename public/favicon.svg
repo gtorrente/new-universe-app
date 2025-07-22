@@ -1,0 +1,11 @@
+<svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+  <rect width="32" height="32" fill="#000000"/>
+  <!-- Planeta -->
+  <ellipse cx="14" cy="18" rx="8" ry="6" fill="#8B5CF6"/>
+  <!-- Anel do planeta -->
+  <ellipse cx="14" cy="18" rx="10" ry="3" fill="none" stroke="#A855F7" stroke-width="1.5"/>
+  <!-- Estrela grande -->
+  <path d="M24 8 L26 12 L30 12 L27 15 L28 19 L24 17 L20 19 L21 15 L18 12 L22 12 Z" fill="#A855F7"/>
+  <!-- Estrela pequena -->
+  <path d="M26 22 L27 24 L29 24 L27.5 25.5 L28 27 L26 26 L24 27 L24.5 25.5 L23 24 L25 24 Z" fill="#A855F7"/>
+</svg>
