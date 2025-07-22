@@ -36,6 +36,23 @@ function getSign(day, month) {
   return signs[signs.length - 1];
 }
 
+function getSignMapping() {
+  return [
+    { sign: "Aquário", en: "aquarius" },
+    { sign: "Peixes", en: "pisces" },
+    { sign: "Áries", en: "aries" },
+    { sign: "Touro", en: "taurus" },
+    { sign: "Gêmeos", en: "gemini" },
+    { sign: "Câncer", en: "cancer" },
+    { sign: "Leão", en: "leo" },
+    { sign: "Virgem", en: "virgo" },
+    { sign: "Libra", en: "libra" },
+    { sign: "Escorpião", en: "scorpio" },
+    { sign: "Sagitário", en: "sagittarius" },
+    { sign: "Capricórnio", en: "capricorn" },
+  ];
+}
+
 function useHoroscopo(signoEn) {
   const [horoscopo, setHoroscopo] = useState("");
   const [loading, setLoading] = useState(false);
@@ -91,11 +108,25 @@ export default function Home() {
         if (userSnap.exists()) {
           setCreditos(userSnap.data().creditos || 0);
           const dataNasc = userSnap.data().dataNascimento;
+          const signSalvo = userSnap.data().sign; // Campo signo salvo no Firebase
+          
           if (dataNasc) {
-            const [, mes, dia] = dataNasc.split('-').map(Number);
-            const signObj = getSign(dia, mes);
-            setSigno(signObj.sign);
-            setSignoEn(signObj.en);
+            // Se já tem signo salvo, usa ele
+            if (signSalvo) {
+              setSignoEn(signSalvo);
+              // Converte de inglês para português para exibição
+              const signObj = getSignMapping().find(s => s.en === signSalvo);
+              setSigno(signObj ? signObj.sign : "");
+            } else {
+              // Se não tem signo salvo, calcula e salva
+              const [, mes, dia] = dataNasc.split('-').map(Number);
+              const signObj = getSign(dia, mes);
+              setSigno(signObj.sign);
+              setSignoEn(signObj.en);
+              
+              // Salva o signo no Firebase
+              await setDoc(userRef, { sign: signObj.en }, { merge: true });
+            }
           }
           if (!dataNasc) setShowModal(true);
         } else {
@@ -112,10 +143,18 @@ export default function Home() {
   async function handleSalvarData() {
     if (!dataNascimento || !userDocId) return;
     const userRef = doc(db, "usuarios", userDocId);
-    await setDoc(userRef, { dataNascimento }, { merge: true });
-    // Atualizar o signo imediatamente
+    
+    // Calcular o signo baseado na data de nascimento
     const [, mes, dia] = dataNascimento.split('-').map(Number);
     const signObj = getSign(dia, mes);
+    
+    // Salvar tanto a data quanto o signo no Firebase
+    await setDoc(userRef, { 
+      dataNascimento,
+      sign: signObj.en // Salva o signo em inglês
+    }, { merge: true });
+    
+    // Atualizar o estado local
     setSigno(signObj.sign);
     setSignoEn(signObj.en);
     setShowModal(false);

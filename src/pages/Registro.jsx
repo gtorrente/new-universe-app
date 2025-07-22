@@ -1,11 +1,37 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
-import { auth } from "../firebaseConfigFront";
+import { auth, db } from "../firebaseConfigFront";
+import { doc, setDoc } from "firebase/firestore";
 import { EyeIcon, EyeSlashIcon, EnvelopeIcon, LockClosedIcon, CalendarIcon, UserIcon } from "@heroicons/react/24/outline";
 import { motion } from "framer-motion";
 import LogoUniversoCatia from "../assets/logo-purple-universo-catia.png";
 import { Link } from "react-router-dom";
+
+// Função para calcular o signo baseado na data de nascimento
+function getSign(day, month) {
+  const signs = [
+    { sign: "Aquário", start: [1, 20], en: "aquarius" },
+    { sign: "Peixes", start: [2, 19], en: "pisces" },
+    { sign: "Áries", start: [3, 21], en: "aries" },
+    { sign: "Touro", start: [4, 20], en: "taurus" },
+    { sign: "Gêmeos", start: [5, 21], en: "gemini" },
+    { sign: "Câncer", start: [6, 21], en: "cancer" },
+    { sign: "Leão", start: [7, 23], en: "leo" },
+    { sign: "Virgem", start: [8, 23], en: "virgo" },
+    { sign: "Libra", start: [9, 23], en: "libra" },
+    { sign: "Escorpião", start: [10, 23], en: "scorpio" },
+    { sign: "Sagitário", start: [11, 22], en: "sagittarius" },
+    { sign: "Capricórnio", start: [12, 22], en: "capricorn" },
+  ];
+  const date = new Date(2020, month - 1, day);
+  for (let i = signs.length - 1; i >= 0; i--) {
+    const [m, d] = signs[i].start;
+    const startDate = new Date(2020, m - 1, d);
+    if (date >= startDate) return signs[i];
+  }
+  return signs[signs.length - 1];
+}
 
 export default function Registro() {
   const [showPassword, setShowPassword] = useState(false);
@@ -48,7 +74,22 @@ export default function Registro() {
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, senha);
       await updateProfile(userCredential.user, { displayName: nome });
-      // Aqui você pode salvar nascimento/termos no Firestore se quiser
+      
+      // Calcular o signo baseado na data de nascimento
+      const [, mes, dia] = nascimento.split('-').map(Number);
+      const signObj = getSign(dia, mes);
+      
+      // Salvar dados do usuário no Firestore incluindo o signo
+      const userRef = doc(db, "usuarios", userCredential.user.uid);
+      await setDoc(userRef, {
+        nome: nome,
+        email: email,
+        dataNascimento: nascimento,
+        sign: signObj.en, // Salva o signo em inglês
+        creditos: 5, // Créditos iniciais
+        foto: userCredential.user.photoURL || "",
+      });
+      
       setErro("");
       navigate("/");
     } catch (error) {
