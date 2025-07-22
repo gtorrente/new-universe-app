@@ -1,7 +1,7 @@
 // Página principal do app Universo Catia
 // Exibe saudação, horóscopo do dia, atalhos rápidos e acesso ao chat com a CatIA
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Header from "../components/Header";
 import { auth } from "../firebaseConfigFront";
 import { db } from "../firebaseConfigFront";
@@ -53,30 +53,111 @@ function getSignMapping() {
   ];
 }
 
+// Cache em memória para o horóscopo diário
+const horoscopoDiarioCache = new Map();
+const CACHE_DURATION_DIARIO = 6 * 60 * 60 * 1000; // 6 horas em millisegundos
+
+// Função para verificar se o cache é válido
+function isCacheValidDiario(timestamp) {
+  return Date.now() - timestamp < CACHE_DURATION_DIARIO;
+}
+
+// Função para obter chave do cache baseada no dia atual
+function getDailyCacheKey(signo) {
+  const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+  return `${signo}-${today}`;
+}
+
 function useHoroscopo(signoEn) {
   const [horoscopo, setHoroscopo] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  // Função para buscar horóscopo com cache inteligente
+  const buscarHoroscopoDiario = useCallback(async (signo) => {
+    if (!signo) return;
+
+    const cacheKey = getDailyCacheKey(signo);
+    
+    // 1. Verifica cache em memória primeiro
+    const cachedData = horoscopoDiarioCache.get(cacheKey);
+    if (cachedData && isCacheValidDiario(cachedData.timestamp)) {
+      console.log('📦 Horóscopo carregado do cache em memória');
+      setHoroscopo(cachedData.data);
+      setLoading(false);
+      setError(null);
+      return;
+    }
+
+    // 2. Verifica localStorage como backup
+    try {
+      const localCache = localStorage.getItem(`horoscopo-diario-${cacheKey}`);
+      if (localCache) {
+        const parsed = JSON.parse(localCache);
+        if (isCacheValidDiario(parsed.timestamp)) {
+          console.log('💾 Horóscopo carregado do localStorage');
+          setHoroscopo(parsed.data);
+          // Atualiza cache em memória
+          horoscopoDiarioCache.set(cacheKey, parsed);
+          setLoading(false);
+          setError(null);
+          return;
+        } else {
+          // Cache expirado - remove
+          localStorage.removeItem(`horoscopo-diario-${cacheKey}`);
+        }
+      }
+    } catch {
+      // Ignora erros de cache corrompido
+    }
+
+    // 3. Busca na API apenas se não há cache válido
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const res = await fetch("https://81dbde66ca8f.ngrok-free.app/horoscopo", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sign: signo }),
+      });
+
+      if (!res.ok) {
+        throw new Error(`Erro na API: ${res.status}`);
+      }
+
+      const data = await res.json();
+      const horoscopoTexto = data.horoscopo || "Horóscopo indisponível.";
+      
+      setHoroscopo(horoscopoTexto);
+
+      // 4. Salva no cache (memória + localStorage)
+      const cacheData = {
+        data: horoscopoTexto,
+        timestamp: Date.now()
+      };
+      
+      horoscopoDiarioCache.set(cacheKey, cacheData);
+      localStorage.setItem(`horoscopo-diario-${cacheKey}`, JSON.stringify(cacheData));
+      
+      console.log('🌐 Horóscopo carregado da API e salvo no cache');
+      
+    } catch (err) {
+      console.error("Erro ao buscar horóscopo diário:", err);
+      setError("Não foi possível carregar o horóscopo hoje.");
+      setHoroscopo("Não foi possível obter o horóscopo agora.");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    if (!signoEn) return;
-    setLoading(true);
-    fetch("https://81dbde66ca8f.ngrok-free.app/horoscopo", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ sign: signoEn }),
-    })
-      .then(res => res.json())
-      .then(data => {
-        setHoroscopo(data.horoscopo || "Horóscopo indisponível.");
-        setLoading(false);
-      })
-      .catch(() => {
-        setHoroscopo("Não foi possível obter o horóscopo agora.");
-        setLoading(false);
-      });
-  }, [signoEn]);
+    if (signoEn) {
+      buscarHoroscopoDiario(signoEn);
+    }
+  }, [signoEn, buscarHoroscopoDiario]);
 
-  return { horoscopo, loading };
+  return { horoscopo, loading, error, refresh: () => buscarHoroscopoDiario(signoEn) };
 }
 
 export default function Home() {
@@ -89,6 +170,47 @@ export default function Home() {
   const [userDocId, setUserDocId] = useState(null);
   const [signo, setSigno] = useState('');
   const [signoEn, setSignoEn] = useState('');
+
+  // Limpeza automática do cache expirado
+  useEffect(() => {
+    const cleanupCache = () => {
+      // Limpa cache em memória
+      for (const [key, value] of horoscopoDiarioCache.entries()) {
+        if (!isCacheValidDiario(value.timestamp)) {
+          horoscopoDiarioCache.delete(key);
+        }
+      }
+      
+      // Limpa localStorage
+      const keysToRemove = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith('horoscopo-diario-')) {
+          try {
+            const data = JSON.parse(localStorage.getItem(key) || '{}');
+            if (!isCacheValidDiario(data.timestamp)) {
+              keysToRemove.push(key);
+            }
+          } catch {
+            keysToRemove.push(key); // Remove dados corrompidos
+          }
+        }
+      }
+      keysToRemove.forEach(key => localStorage.removeItem(key));
+      
+      if (keysToRemove.length > 0) {
+        console.log(`🧹 Cache de horóscopo limpo: ${keysToRemove.length} itens expirados removidos`);
+      }
+    };
+
+    // Executa limpeza na inicialização
+    cleanupCache();
+    
+    // Executa limpeza a cada hora
+    const interval = setInterval(cleanupCache, 60 * 60 * 1000);
+    
+    return () => clearInterval(interval);
+  }, []);
 
   // Efeito para buscar usuário autenticado e créditos no Firestore
   useEffect(() => {
@@ -160,7 +282,7 @@ export default function Home() {
     setShowModal(false);
   }
 
-  const { horoscopo, loading: loadingHoroscopo } = useHoroscopo(signoEn);
+  const { horoscopo, loading: loadingHoroscopo, error: errorHoroscopo, refresh } = useHoroscopo(signoEn);
 
   return (
     <div className="bg-gradient-to-br from-purple-100 to-blue-100 min-h-screen">
@@ -200,11 +322,26 @@ export default function Home() {
 
       {/* Card do horóscopo do dia */}
       <div className="px-4">
-        <HoroscopeCard
-          sign={signo || "Seu signo"}
-          energy={4}
-          message={loadingHoroscopo ? "Carregando horóscopo..." : horoscopo}
-        />
+        <div className="relative">
+          <HoroscopeCard
+            sign={signo || "Seu signo"}
+            energy={4}
+            message={loadingHoroscopo ? "Carregando horóscopo..." : horoscopo}
+          />
+          
+          {/* Botão de refresh em caso de erro */}
+          {errorHoroscopo && !loadingHoroscopo && (
+            <div className="absolute bottom-2 right-2">
+              <button 
+                onClick={refresh}
+                className="text-xs text-red-500 bg-red-50 hover:bg-red-100 px-2 py-1 rounded-full transition"
+                title="Tentar carregar novamente"
+              >
+                🔄 Tentar novamente
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Grid de cards de acesso rápido para funcionalidades principais */}
