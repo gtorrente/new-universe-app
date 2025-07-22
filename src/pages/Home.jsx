@@ -14,26 +14,52 @@ import { useNavigate } from 'react-router-dom'
 
 function getSign(day, month) {
   const signs = [
-    { sign: "Aquário", start: [1, 20] },
-    { sign: "Peixes", start: [2, 19] },
-    { sign: "Áries", start: [3, 21] },
-    { sign: "Touro", start: [4, 20] },
-    { sign: "Gêmeos", start: [5, 21] },
-    { sign: "Câncer", start: [6, 21] },
-    { sign: "Leão", start: [7, 23] },
-    { sign: "Virgem", start: [8, 23] },
-    { sign: "Libra", start: [9, 23] },
-    { sign: "Escorpião", start: [10, 23] },
-    { sign: "Sagitário", start: [11, 22] },
-    { sign: "Capricórnio", start: [12, 22] },
+    { sign: "Aquário", start: [1, 20], en: "aquarius" },
+    { sign: "Peixes", start: [2, 19], en: "pisces" },
+    { sign: "Áries", start: [3, 21], en: "aries" },
+    { sign: "Touro", start: [4, 20], en: "taurus" },
+    { sign: "Gêmeos", start: [5, 21], en: "gemini" },
+    { sign: "Câncer", start: [6, 21], en: "cancer" },
+    { sign: "Leão", start: [7, 23], en: "leo" },
+    { sign: "Virgem", start: [8, 23], en: "virgo" },
+    { sign: "Libra", start: [9, 23], en: "libra" },
+    { sign: "Escorpião", start: [10, 23], en: "scorpio" },
+    { sign: "Sagitário", start: [11, 22], en: "sagittarius" },
+    { sign: "Capricórnio", start: [12, 22], en: "capricorn" },
   ];
   const date = new Date(2020, month - 1, day);
   for (let i = signs.length - 1; i >= 0; i--) {
     const [m, d] = signs[i].start;
     const startDate = new Date(2020, m - 1, d);
-    if (date >= startDate) return signs[i].sign;
+    if (date >= startDate) return signs[i];
   }
-  return "Capricórnio";
+  return signs[signs.length - 1];
+}
+
+function useHoroscopo(signoEn) {
+  const [horoscopo, setHoroscopo] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!signoEn) return;
+    setLoading(true);
+    fetch("https://81dbde66ca8f.ngrok-free.app/horoscopo", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ sign: signoEn }),
+    })
+      .then(res => res.json())
+      .then(data => {
+        setHoroscopo(data.horoscopo || "Horóscopo indisponível.");
+        setLoading(false);
+      })
+      .catch(() => {
+        setHoroscopo("Não foi possível obter o horóscopo agora.");
+        setLoading(false);
+      });
+  }, [signoEn]);
+
+  return { horoscopo, loading };
 }
 
 export default function Home() {
@@ -45,6 +71,7 @@ export default function Home() {
   const [dataNascimento, setDataNascimento] = useState('');
   const [userDocId, setUserDocId] = useState(null);
   const [signo, setSigno] = useState('');
+  const [signoEn, setSignoEn] = useState('');
 
   // Efeito para buscar usuário autenticado e créditos no Firestore
   useEffect(() => {
@@ -66,7 +93,9 @@ export default function Home() {
           const dataNasc = userSnap.data().dataNascimento;
           if (dataNasc) {
             const [, mes, dia] = dataNasc.split('-').map(Number);
-            setSigno(getSign(dia, mes));
+            const signObj = getSign(dia, mes);
+            setSigno(signObj.sign);
+            setSignoEn(signObj.en);
           }
           if (!dataNasc) setShowModal(true);
         } else {
@@ -86,9 +115,13 @@ export default function Home() {
     await setDoc(userRef, { dataNascimento }, { merge: true });
     // Atualizar o signo imediatamente
     const [, mes, dia] = dataNascimento.split('-').map(Number);
-    setSigno(getSign(dia, mes));
+    const signObj = getSign(dia, mes);
+    setSigno(signObj.sign);
+    setSignoEn(signObj.en);
     setShowModal(false);
   }
+
+  const { horoscopo, loading: loadingHoroscopo } = useHoroscopo(signoEn);
 
   return (
     <div className="bg-gradient-to-br from-purple-100 to-blue-100 min-h-screen">
@@ -131,11 +164,7 @@ export default function Home() {
         <HoroscopeCard
           sign={signo || "Seu signo"}
           energy={4}
-          message={
-            signo
-              ? `Hoje é um dia especial para quem é de ${signo}! As energias cósmicas estão alinhadas para você.`
-              : "Preencha sua data de nascimento para ver seu horóscopo personalizado."
-          }
+          message={loadingHoroscopo ? "Carregando horóscopo..." : horoscopo}
         />
       </div>
 
