@@ -116,7 +116,7 @@ function useHoroscopo(signoEn) {
       setLoading(true);
       setError(null);
       
-      const res = await fetch("https://81dbde66ca8f.ngrok-free.app/horoscopo", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/horoscopo`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ sign: signo }),

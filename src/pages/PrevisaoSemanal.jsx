@@ -174,7 +174,7 @@ export default function PrevisaoSemanal() {
       setLoading(true);
       setError(null);
       
-      const res = await fetch("https://81dbde66ca8f.ngrok-free.app/horoscopo-semanal", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/horoscopo-semanal`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ sign: signo })
