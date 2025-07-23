@@ -12,7 +12,7 @@ export default function ReceitasSalvas() {
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (firebaseUser) => {
       setUser(firebaseUser);
-      if (firebaseUser) {
+      if (firebaseUser) { 
         // Buscar favoritos do usuário
         const favsSnap = await getDocs(collection(db, 'usuarios', firebaseUser.uid, 'favoritos'));
         const favIds = favsSnap.docs.map(doc => doc.id);
