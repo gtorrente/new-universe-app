@@ -8,7 +8,7 @@ import Tarot from './pages/Tarot'
 import Receitas from './pages/Receitas'
 import Perfil from './pages/Perfil'
 import Login from "./pages/Login";
-import CatiaChat from './pages/CatiaChat';
+import CatiaChat from './pages/CatiaChat'; 
 import PrevisaoSemanal from './pages/PrevisaoSemanal';
 import Diario from './pages/Diario';
 import Registro from './pages/Registro';
