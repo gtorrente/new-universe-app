@@ -108,21 +108,39 @@ export default function PrevisaoSemanal() {
 
   // Recupera usuário + dados do Firestore
   useEffect(() => {
+    console.log("🌟 Previsão: Iniciando carregamento do usuário");
+    
     const unsubscribe = auth.onAuthStateChanged(async (firebaseUser) => {
+      console.log("🌟 Previsão: Usuário autenticado:", !!firebaseUser);
+      
       setUser(firebaseUser);
       if (firebaseUser) {
-        const userRef = doc(db, "usuarios", firebaseUser.uid);
-        const userSnap = await getDoc(userRef);
+        try {
+          console.log("🌟 Previsão: Buscando dados do usuário no Firestore");
+          const userRef = doc(db, "usuarios", firebaseUser.uid);
+          const userSnap = await getDoc(userRef);
 
-        if (userSnap.exists()) {
-          const dados = userSnap.data();
-          setCreditos(dados.creditos || 0);
-          setSignoUsuario((dados.sign || "").toLowerCase());
-        } else {
+          if (userSnap.exists()) {
+            const dados = userSnap.data();
+            console.log("🌟 Previsão: Dados do usuário:", dados);
+            
+            setCreditos(dados.creditos || 0);
+            const signo = (dados.sign || "").toLowerCase();
+            console.log("🌟 Previsão: Signo encontrado:", signo);
+            setSignoUsuario(signo);
+          } else {
+            console.log("❌ Previsão: Documento do usuário não encontrado");
+            setCreditos(0);
+            setSignoUsuario("");
+          }
+        } catch (error) {
+          console.error("❌ Previsão: Erro ao buscar dados:", error);
           setCreditos(0);
+          setSignoUsuario("");
         }
       } else {
         setCreditos(0);
+        setSignoUsuario("");
       }
     });
 
@@ -131,9 +149,15 @@ export default function PrevisaoSemanal() {
 
   // Função para buscar horóscopo com cache inteligente
   const buscarHoroscopoSemanal = useCallback(async (signo) => {
-    if (!signo) return;
+    console.log("🌟 Previsão: Buscando horóscopo para signo:", signo);
+    
+    if (!signo) {
+      console.log("❌ Previsão: Signo vazio, não buscando");
+      return;
+    }
 
     const cacheKey = getWeekCacheKey(signo);
+    console.log("📦 Previsão: Cache key:", cacheKey);
     
     // 1. Verifica cache em memória primeiro
     const cachedData = horoscopoCache.get(cacheKey);
@@ -174,17 +198,23 @@ export default function PrevisaoSemanal() {
       setLoading(true);
       setError(null);
       
+      console.log("🌐 Previsão: Fazendo chamada para API com signo:", signo);
+      console.log("🌐 Previsão: URL da API:", `${import.meta.env.VITE_API_URL}/horoscopo-semanal`);
+      
       const res = await fetch(`${import.meta.env.VITE_API_URL}/horoscopo-semanal`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ sign: signo })
       });
 
+      console.log("📡 Previsão: Resposta da API status:", res.status);
+
       if (!res.ok) {
         throw new Error(`Erro na API: ${res.status}`);
       }
 
       const data = await res.json();
+      console.log("✅ Previsão: Dados recebidos da API:", data);
       
       const semanaFormatada = [
         { dia: "Seg", ...data.semana.segunda },
@@ -314,8 +344,13 @@ export default function PrevisaoSemanal() {
 
   // Busca o horóscopo semanal após obter o signo
   useEffect(() => {
+    console.log("🔍 Previsão: Verificando signo para buscar horóscopo:", signoUsuario);
+    
     if (signoUsuario) {
+      console.log("✅ Previsão: Signo válido, buscando horóscopo semanal");
       buscarHoroscopoSemanal(signoUsuario);
+    } else {
+      console.log("❌ Previsão: Signo não encontrado ou vazio");
     }
   }, [signoUsuario, buscarHoroscopoSemanal]);
 
