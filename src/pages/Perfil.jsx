@@ -29,14 +29,27 @@ export default function Perfil() {
   // Buscar dados do usuário
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (firebaseUser) => {
-      setUser(firebaseUser);
-      if (firebaseUser) {
-        const userRef = doc(db, "usuarios", firebaseUser.uid);
-        const userSnap = await getDoc(userRef);
-        setCreditos(userSnap.exists() ? userSnap.data().creditos || 0 : 0);
+      try {
+        setUser(firebaseUser);
+        if (firebaseUser) {
+          const userRef = doc(db, "usuarios", firebaseUser.uid);
+          const userSnap = await getDoc(userRef);
+          
+          if (userSnap.exists()) {
+            const userData = userSnap.data();
+            setCreditos(userData.creditos || 0);
+          } else {
+            setCreditos(0);
+          }
+        }
+      } catch (error) {
+        console.error("Erro ao carregar dados do perfil:", error);
+        setCreditos(0);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     });
+    
     return () => unsubscribe();
   }, []);
 

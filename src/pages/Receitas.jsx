@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import { auth, db } from '../firebaseConfigFront';
 import { doc, getDoc, collection, getDocs } from 'firebase/firestore';
-import receitasData from '../data/receitas.json';
+// import receitasData from '../data/receitas.json'; // Não usado mais
 
 export default function Receitas() {
   // Simulação do estado de assinatura premium
@@ -39,10 +39,75 @@ export default function Receitas() {
   useEffect(() => {
     async function fetchCategorias() {
       setLoadingCategorias(true);
-      const querySnapshot = await getDocs(collection(db, 'categorias'));
-      const data = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setCategorias(data);
-      setLoadingCategorias(false);
+      console.log("🍳 Carregando categorias do Firebase...");
+      
+      try {
+        const querySnapshot = await getDocs(collection(db, 'categorias'));
+        const data = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        
+        console.log("📊 Categorias encontradas:", data.length);
+        console.log("📝 Dados das categorias:", data);
+        
+        if (data.length === 0) {
+          console.log("⚠️ Nenhuma categoria encontrada no Firebase, usando dados estáticos");
+          // Fallback para dados estáticos se Firebase estiver vazio
+          const categoriasEstaticas = [
+            {
+              id: "caldos",
+              titulo: "Caldos e Sopas",
+              emoji: "🍲", 
+              imagem: "https://images.unsplash.com/photo-1613844237701-8f3664fc2eff?w=600&h=400&fit=crop",
+              descricao: "Receitas quentinhas para aquecer o coração.",
+              premium: false
+            },
+            {
+              id: "basico",
+              titulo: "Básico na Cozinha",
+              emoji: "🍳",
+              imagem: "https://images.unsplash.com/photo-1536304993881-ff6e9eefa2a6?w=600&h=400&fit=crop", 
+              descricao: "O essencial para quem está começando.",
+              premium: false
+            },
+            {
+              id: "italianas",
+              titulo: "Delícias Italianas", 
+              emoji: "🍝",
+              imagem: "https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?w=600&h=400&fit=crop",
+              descricao: "Receitas cheias de sabor para adoçar seu dia.",
+              premium: true
+            }
+          ];
+          setCategorias(categoriasEstaticas);
+        } else {
+          setCategorias(data);
+        }
+        
+      } catch (error) {
+        console.error("❌ Erro ao carregar categorias:", error);
+        
+        // Fallback em caso de erro
+        const categoriasEstaticas = [
+          {
+            id: "caldos",
+            titulo: "Caldos e Sopas", 
+            emoji: "🍲",
+            imagem: "https://images.unsplash.com/photo-1613844237701-8f3664fc2eff?w=600&h=400&fit=crop",
+            descricao: "Receitas quentinhas para aquecer o coração.",
+            premium: false
+          },
+          {
+            id: "basico", 
+            titulo: "Básico na Cozinha",
+            emoji: "🍳",
+            imagem: "https://images.unsplash.com/photo-1536304993881-ff6e9eefa2a6?w=600&h=400&fit=crop",
+            descricao: "O essencial para quem está começando.",
+            premium: false
+          }
+        ];
+        setCategorias(categoriasEstaticas);
+      } finally {
+        setLoadingCategorias(false);
+      }
     }
     fetchCategorias();
   }, []);
