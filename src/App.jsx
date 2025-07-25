@@ -1,5 +1,6 @@
 import { Routes, Route, useLocation } from 'react-router-dom'
 import ProtectedRoute from './components/ProtectedRoute'
+import AdminRoute from './components/AdminRoute'
 import ScrollToTop from './components/ScrollToTop'
 
 import Home from './pages/Home'
@@ -16,7 +17,13 @@ import CategoriaReceita from './pages/CategoriaReceita';
 import ReceitaExemplo from './pages/ReceitaExemplo';
 import ReceitaCompleta from './pages/ReceitaCompleta';
 import ReceitasAdmin from './pages/admin/ReceitasAdmin';
+import AdminDashboard from './pages/admin/AdminDashboard';
+import UsersAdmin from './pages/admin/UsersAdmin';
+import EmailsAdmin from './pages/admin/EmailsAdmin';
+import NotificationsAdmin from './pages/admin/NotificationsAdmin';
 import ReceitasSalvas from './pages/ReceitasSalvas';
+import MinhasConversas from './pages/MinhasConversas';
+import Configuracoes from './pages/Configuracoes';
 
 import BottomNav from './components/BottomNav'
 
@@ -127,7 +134,63 @@ export default function App() {
               </ProtectedRoute>
             }
           />
-          <Route path="/admin/receitas" element={<ReceitasAdmin />} />
+          {/* Rotas de Administração - Protegidas */}
+          <Route 
+            path="/admin" 
+            element={
+              <AdminRoute>
+                <AdminDashboard />
+              </AdminRoute>
+            } 
+          />
+          <Route 
+            path="/admin/users" 
+            element={
+              <AdminRoute>
+                <UsersAdmin />
+              </AdminRoute>
+            } 
+          />
+          <Route 
+            path="/admin/emails" 
+            element={
+              <AdminRoute>
+                <EmailsAdmin />
+              </AdminRoute>
+            } 
+          />
+          <Route 
+            path="/admin/notifications" 
+            element={
+              <AdminRoute>
+                <NotificationsAdmin />
+              </AdminRoute>
+            } 
+          />
+          <Route 
+            path="/admin/receitas" 
+            element={
+              <AdminRoute>
+                <ReceitasAdmin />
+              </AdminRoute>
+            } 
+          />
+          <Route
+            path="/minhas-conversas"
+            element={
+              <ProtectedRoute>
+                <MinhasConversas />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/configuracoes"
+            element={
+              <ProtectedRoute>
+                <Configuracoes />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </main>
       {/* Menu inferior fixo */}

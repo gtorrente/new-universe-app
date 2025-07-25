@@ -19,7 +19,7 @@ export default function Tarot() {
   // --- ESTADOS GLOBAIS DO FLUXO ---
   const [usuario, setUsuario] = useState(null); // Usuário autenticado
   const [creditos, setCreditos] = useState(0); // Créditos do usuário
-  const [jogouHoje, setJogouHoje] = useState(false); // Controle de jogo diário
+  // Removido controle de jogo diário - agora permite múltiplas jogadas até acabar créditos
   const [step, setStep] = useState(1); // Etapa do fluxo (1: pergunta, 2: embaralhar, 3: escolher, 4: resultado)
 
   // --- ESTADOS DO JOGO ---
@@ -45,19 +45,27 @@ export default function Tarot() {
     return () => unsubscribe();
   }, []);
 
-  // --- BUSCA CRÉDITOS: sempre que usuario mudar ---
+  // --- BUSCA CRÉDITOS E VERIFICA JOGO DIÁRIO: sempre que usuario mudar ---
   useEffect(() => {
-    const buscarCreditos = async () => {
+    const buscarDadosUsuario = async () => {
       if (usuario) {
         const userRef = doc(db, "usuarios", usuario.uid);
         const userSnap = await getDoc(userRef);
-        if (userSnap.exists()) setCreditos(userSnap.data().creditos || 0);
-        else setCreditos(0);
+        
+        if (userSnap.exists()) {
+          const userData = userSnap.data();
+          setCreditos(userData.creditos || 0);
+          
+          // Sistema simplificado: apenas controle por créditos
+          console.log("🎴 Tarot: Créditos disponíveis:", userData.creditos || 0);
+        } else {
+          setCreditos(0);
+        }
       } else {
         setCreditos(0);
       }
     };
-    buscarCreditos();
+    buscarDadosUsuario();
   }, [usuario]);
 
   // --- EMBARALHAR CARTAS ---
@@ -68,9 +76,13 @@ export default function Tarot() {
 
   // --- JOGAR NOVAMENTE ---
   const handleJogar = async () => {
+    // Verificar se tem créditos
+    if (creditos === 0) {
+      alert("⚠️ Você não possui créditos suficientes para jogar. Adquira mais créditos.");
+      return;
+    }
+    
     setStep(1);
-    setJogouHoje(false);
-    setCreditos((prev) => prev - 1);
     setPergunta("");
     setRespostaIA("");
     setCartaEscolhida(null);
@@ -83,11 +95,7 @@ export default function Tarot() {
       setRespostaIA("⚠️ Você não possui créditos suficientes para jogar. Adquira mais créditos.");
       return;
     }
-    // Validação se já jogou hoje
-    if (jogouHoje) {
-      setRespostaIA("⚠️ Você já jogou hoje! Para jogar novamente, adquira um novo crédito.");
-      return;
-    }
+    // Sistema simplificado: apenas verificação de créditos (sem limite diário)
     if (!usuario) {
       setRespostaIA("Erro: Usuário não autenticado.");
       return;
@@ -120,14 +128,22 @@ export default function Tarot() {
       setRespostaIA(respostaGerada);
       // Salva a leitura no Firestore
       await addDoc(collection(db, "leituras_tarot"), {
+        userId: usuario.uid,
         nome, pergunta,
         carta: cartaEscolhida.name,
         significado: cartaEscolhida.description,
         resposta: respostaGerada,
         timestamp: new Date()
       });
-      await setDoc(doc(db, "usuarios", usuario.uid), { ultimoJogo: new Date() }, { merge: true });
-      setJogouHoje(true);
+      
+      // Desconta crédito (mantém histórico de último jogo para estatísticas)
+      await setDoc(doc(db, "usuarios", usuario.uid), { 
+        ultimoJogo: new Date(),
+        creditos: creditos - 1
+      }, { merge: true });
+      
+      // Atualiza créditos localmente
+      setCreditos((prev) => prev - 1);
     } catch (error) {
       console.error("Erro ao gerar resposta IA:", error);
       setRespostaIA("Algo deu errado ao gerar sua resposta. Tente novamente.");
