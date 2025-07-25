@@ -37,6 +37,13 @@ export default function Header({ user, creditos }) {
             alt="Avatar"
             className="w-12 h-12 rounded-full bg-white cursor-pointer border-2 border-white"
             onClick={handleAvatarClick}
+            onError={(e) => {
+              console.log("❌ Erro ao carregar foto de perfil:", user?.photoURL);
+              e.target.src = avatarDefault;
+            }}
+            onLoad={() => {
+              console.log("✅ Foto de perfil carregada:", user?.photoURL);
+            }}
           />
         </div>
         <span className="text-lg font-semibold text-gray-800">

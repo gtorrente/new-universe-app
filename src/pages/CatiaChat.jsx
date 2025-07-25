@@ -18,6 +18,179 @@ const sugestoes = [
 // ✅ URL correta do webhook no n8n
 const N8N_WEBHOOK_URL = "https://torrente.app.n8n.cloud/webhook/chat-catia";
 
+// Função para formatar respostas da CatIA
+const formatarResposta = (texto) => {
+  // Detectar se é uma receita (mais preciso)
+  const isReceita = texto.includes('**Ingredientes:**') || 
+                    texto.includes('**Modo de Preparo:**') ||
+                    texto.includes('**Modo de preparo:**') ||
+                    (texto.includes('Ingredientes') && texto.includes('Preparo')) ||
+                    (texto.includes('ingredientes') && texto.includes('preparo')) ||
+                    // Detectar também por contexto de receita
+                    (texto.includes('minutinhos') && (texto.includes('cozinhe') || texto.includes('tempere')));
+
+  if (isReceita) {
+    return formatarReceita(texto);
+  }
+
+  // Formatação geral para outras respostas (com negrito)
+  return formatarTextoGeral(texto);
+};
+
+// Função para formatar receitas
+const formatarReceita = (texto) => {
+  const partes = texto.split(/(\*\*[^*]+\*\*)/g);
+  const blocos = [];
+  let blocoAtual = { tipo: 'texto', conteudo: '' };
+
+  partes.forEach(parte => {
+    if (parte.startsWith('**') && parte.endsWith('**')) {
+      // Verificar se é um título de seção (Ingredientes, Modo de Preparo, etc.)
+      const titulo = parte.replace(/\*\*/g, '');
+      const isSecaoTitle = titulo.toLowerCase().includes('ingredientes') || 
+                          titulo.toLowerCase().includes('modo de preparo') ||
+                          titulo.toLowerCase().includes('preparo') ||
+                          titulo.toLowerCase().includes('receita');
+      
+      if (isSecaoTitle) {
+        // É um título de seção
+        if (blocoAtual.conteudo.trim()) {
+          blocos.push(blocoAtual);
+        }
+        
+        blocoAtual = { 
+          tipo: 'titulo', 
+          conteudo: titulo,
+          icone: getTituloIcon(titulo)
+        };
+        blocos.push(blocoAtual);
+        blocoAtual = { tipo: 'conteudo', conteudo: '' };
+      } else {
+        // É apenas texto em negrito, adicionar ao conteúdo atual
+        blocoAtual.conteudo += parte;
+      }
+    } else {
+      blocoAtual.conteudo += parte;
+    }
+  });
+
+  if (blocoAtual.conteudo.trim()) {
+    blocos.push(blocoAtual);
+  }
+
+  return blocos;
+};
+
+// Função para formatar texto geral
+const formatarTextoGeral = (texto) => {
+  return [{ tipo: 'texto-simples', conteudo: texto }];
+};
+
+// Função para obter ícones baseados no título
+const getTituloIcon = (titulo) => {
+  const tituloLower = titulo.toLowerCase();
+  if (tituloLower.includes('ingredientes')) return '🥗';
+  if (tituloLower.includes('preparo') || tituloLower.includes('modo')) return '👩‍🍳';
+  if (tituloLower.includes('receita') || titulo.toLowerCase().includes('prato')) return '🍽️';
+  return '✨';
+};
+
+// Função para formatar texto com negrito
+const formatarTextoComNegrito = (texto) => {
+  // Dividir o texto por **palavra** para criar elementos em negrito
+  const partes = texto.split(/(\*\*[^*]+\*\*)/g);
+  
+  return partes.map((parte, idx) => {
+    if (parte.startsWith('**') && parte.endsWith('**')) {
+      // É um texto em negrito
+      const textoNegrito = parte.replace(/\*\*/g, '');
+      return (
+        <strong key={idx} className="font-bold text-purple-900">
+          {textoNegrito}
+        </strong>
+      );
+    }
+    return parte;
+  });
+};
+
+// Componente para renderizar blocos formatados
+const BlocoFormatado = ({ bloco }) => {
+  if (bloco.tipo === 'titulo') {
+    return (
+      <div className="flex items-center gap-3 mb-4 mt-6 first:mt-0">
+        <div className="flex items-center justify-center w-8 h-8 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full">
+          <span className="text-white text-lg">{bloco.icone}</span>
+        </div>
+        <h3 className="font-bold text-purple-900 text-xl">{bloco.conteudo}</h3>
+      </div>
+    );
+  }
+
+  if (bloco.tipo === 'conteudo') {
+    const linhas = bloco.conteudo.trim().split('\n').filter(linha => linha.trim());
+    
+    return (
+      <div className="mb-6">
+        {linhas.map((linha, idx) => {
+          const linhaLimpa = linha.trim();
+          if (!linhaLimpa) return null;
+          
+          // Detectar tempo de preparo
+          if (linhaLimpa.includes('minutos') || linhaLimpa.includes('horas')) {
+            return (
+              <div key={idx} className="bg-gradient-to-r from-green-50 to-emerald-50 border-l-4 border-green-400 p-3 mb-3 rounded-r-lg">
+                <div className="flex items-center gap-2">
+                  <span className="text-green-600">⏱️</span>
+                  <span className="text-green-800 font-medium">
+                    {formatarTextoComNegrito(linhaLimpa)}
+                  </span>
+                </div>
+              </div>
+            );
+          }
+          
+          // Se a linha parece ser um item de lista (começa com número ou traço)
+          if (/^\d+\./.test(linhaLimpa) || linhaLimpa.startsWith('-')) {
+            const textoSemMarcador = linhaLimpa.replace(/^\d+\.\s*|-\s*/, '');
+            return (
+              <div key={idx} className="flex items-start gap-3 mb-3 p-2 rounded-lg hover:bg-purple-50 transition-colors">
+                <div className="flex items-center justify-center w-6 h-6 bg-purple-100 rounded-full mt-0.5">
+                  <span className="text-purple-600 font-bold text-xs">•</span>
+                </div>
+                <span className="text-purple-800 leading-relaxed flex-1">
+                  {formatarTextoComNegrito(textoSemMarcador)}
+                </span>
+              </div>
+            );
+          }
+          
+          return (
+            <p key={idx} className="text-purple-800 leading-relaxed mb-3">
+              {formatarTextoComNegrito(linhaLimpa)}
+            </p>
+          );
+        })}
+      </div>
+    );
+  }
+
+  if (bloco.tipo === 'texto-simples') {
+    // Para texto geral (não receitas), aplicar formatação com negrito
+    return (
+      <div className="text-purple-800 leading-relaxed">
+        {formatarTextoComNegrito(bloco.conteudo)}
+      </div>
+    );
+  }
+
+  return (
+    <div className="text-purple-800 leading-relaxed whitespace-pre-wrap">
+      {formatarTextoComNegrito(bloco.conteudo)}
+    </div>
+  );
+};
+
 export default function CatiaChat() {
   const [mensagens, setMensagens] = useState([
     { autor: "catia", texto: "Eu sou a CatIA 🤖✨ Como posso te ajudar hoje?" }
@@ -172,9 +345,11 @@ export default function CatiaChat() {
                   initial={{ opacity: 0, x: -30 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.5 }}
-                  className="max-w-[80%] rounded-2xl px-4 py-3 shadow font-sans text-base bg-purple-100 text-purple-800 self-start"
+                  className="max-w-[90%] rounded-2xl px-6 py-5 shadow-lg font-sans bg-white border border-purple-100 self-start"
                 >
-                  {msg.texto}
+                  {formatarResposta(msg.texto).map((bloco, blocoIdx) => (
+                    <BlocoFormatado key={blocoIdx} bloco={bloco} />
+                  ))}
                 </motion.div>
               ) : (
                 <div

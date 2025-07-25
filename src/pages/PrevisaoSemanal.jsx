@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import { auth, db } from "../firebaseConfigFront";
 import { doc, getDoc } from "firebase/firestore";
@@ -49,6 +50,7 @@ function getWeekCacheKey(signo) {
 }
 
 export default function PrevisaoSemanal() {
+  const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [creditos, setCreditos] = useState(0);
   const [signoUsuario, setSignoUsuario] = useState(null);
@@ -486,7 +488,10 @@ export default function PrevisaoSemanal() {
         )}
 
         <div className="flex flex-col items-center gap-2 mt-2">
-          <button className="flex items-center gap-2 px-5 py-3 rounded-xl bg-white/90 border border-purple-200 text-purple-700 font-bold shadow hover:bg-purple-100 transition">
+          <button 
+            onClick={() => navigate('/diario')}
+            className="flex items-center gap-2 px-5 py-3 rounded-xl bg-white/90 border border-purple-200 text-purple-700 font-bold shadow hover:bg-purple-100 transition"
+          >
             <FaRegEdit className="text-lg" /> Quero escrever sobre minha semana
           </button>
         </div>

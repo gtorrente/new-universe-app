@@ -215,22 +215,44 @@ export default function Home() {
   // Efeito para buscar usuário autenticado e créditos no Firestore
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (firebaseUser) => {
+      console.log("👤 Home: Usuário detectado:", !!firebaseUser);
+      if (firebaseUser) {
+        console.log("📧 Home: Email:", firebaseUser.email);
+        console.log("📛 Home: Nome:", firebaseUser.displayName);
+        console.log("📸 Home: Foto URL:", firebaseUser.photoURL);
+      }
       setUser(firebaseUser);
       if (firebaseUser) {
         const userRef = doc(db, "usuarios", firebaseUser.uid);
-        // Cria/atualiza o documento do usuário com nome, email, foto
-        await setDoc(userRef, {
-          nome: firebaseUser.displayName || "",
-          email: firebaseUser.email || "",
-          foto: firebaseUser.photoURL || "",
-        }, { merge: true });
-
+        
         setUserDocId(firebaseUser.uid);
         const userSnap = await getDoc(userRef);
+        
         if (userSnap.exists()) {
-          setCreditos(userSnap.data().creditos || 0);
-          const dataNasc = userSnap.data().dataNascimento;
-          const signSalvo = userSnap.data().sign; // Campo signo salvo no Firebase
+          const userData = userSnap.data();
+          
+          // Atualizar dados básicos do usuário sempre (incluindo foto)
+          console.log("📸 Foto do usuário no Firebase Auth:", firebaseUser.photoURL);
+          const dadosBasicos = {
+            nome: firebaseUser.displayName || "",
+            email: firebaseUser.email || "",
+            foto: firebaseUser.photoURL || "",
+          };
+          
+          // Garantir que usuário sempre tenha créditos (mínimo 5 se for novo)
+          if (userData.creditos === undefined || userData.creditos === null) {
+            console.log("🎁 Novo usuário! Atribuindo 5 créditos iniciais");
+            dadosBasicos.creditos = 5;
+            setCreditos(5);
+          } else {
+            setCreditos(userData.creditos);
+          }
+          
+          // Salvar todos os dados de uma vez
+          await setDoc(userRef, dadosBasicos, { merge: true });
+          
+          const dataNasc = userData.dataNascimento;
+          const signSalvo = userData.sign; // Campo signo salvo no Firebase
           
           if (dataNasc) {
             // Se já tem signo salvo, usa ele
@@ -252,7 +274,15 @@ export default function Home() {
           }
           if (!dataNasc) setShowModal(true);
         } else {
-          setCreditos(0);
+          // Usuário completamente novo - criar documento com dados completos
+          console.log("👤 Usuário completamente novo! Criando documento com 5 créditos");
+          await setDoc(userRef, {
+            nome: firebaseUser.displayName || "",
+            email: firebaseUser.email || "",
+            foto: firebaseUser.photoURL || "",
+            creditos: 5
+          }, { merge: true });
+          setCreditos(5);
           setShowModal(true);
         }
       } else {
@@ -270,11 +300,25 @@ export default function Home() {
     const [, mes, dia] = dataNascimento.split('-').map(Number);
     const signObj = getSign(dia, mes);
     
-    // Salvar tanto a data quanto o signo no Firebase
-    await setDoc(userRef, { 
+    // Verificar se usuário tem créditos, se não tiver, dar 5 iniciais
+    const userSnap = await getDoc(userRef);
+    const userData = userSnap.exists() ? userSnap.data() : {};
+    const creditosAtuais = userData.creditos;
+    
+    // Salvar data, signo e garantir créditos iniciais
+    const dadosParaSalvar = { 
       dataNascimento,
       sign: signObj.en // Salva o signo em inglês
-    }, { merge: true });
+    };
+    
+    // Se não tem créditos definidos, dar 5 iniciais
+    if (creditosAtuais === undefined || creditosAtuais === null) {
+      console.log("🎁 Atribuindo 5 créditos iniciais ao salvar data de nascimento");
+      dadosParaSalvar.creditos = 5;
+      setCreditos(5);
+    }
+    
+    await setDoc(userRef, dadosParaSalvar, { merge: true });
     
     // Atualizar o estado local
     setSigno(signObj.sign);
