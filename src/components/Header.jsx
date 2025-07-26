@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { FaFire } from "react-icons/fa";
+import { FaCoins } from "react-icons/fa";
 import { FiBell } from "react-icons/fi";
 import avatarDefault from '../assets/avatar.png';
 
@@ -62,7 +62,7 @@ export default function Header({ user, creditos }) {
             className="flex items-center bg-gray-100 px-3 py-1 rounded-xl shadow text-gray-800 font-bold cursor-pointer select-none hover:bg-gray-200 transition"
             onClick={() => setOpenCreditos((prev) => !prev)}
           >
-            <FaFire className="text-yellow-400 mr-1" />
+            <FaCoins className="text-amber-500 mr-1" />
             <span>{creditos}</span>
           </div>
           {openCreditos && (
@@ -71,7 +71,10 @@ export default function Header({ user, creditos }) {
               <p className="text-gray-300 mb-4 text-sm text-center">Créditos disponíveis: <span className="font-bold text-white">{creditos}</span></p>
               <button
                 className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-lg mb-2 transition text-base"
-                onClick={() => alert('Redirecione para tela de pagamento!')}
+                onClick={() => {
+                  setOpenCreditos(false);
+                  navigate('/comprar-creditos');
+                }}
               >
                 Adicione Créditos
               </button>

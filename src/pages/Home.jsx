@@ -1,16 +1,33 @@
 // Página principal do app Universo Catia
 // Exibe saudação, horóscopo do dia, atalhos rápidos e acesso ao chat com a CatIA
 
-import { useEffect, useState, useCallback } from "react";
-import Header from "../components/Header";
-import { auth } from "../firebaseConfigFront";
-import { db } from "../firebaseConfigFront";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { 
+  FaStar, 
+  FaHeart, 
+  FaComments, 
+  FaUtensils, 
+  FaGem, 
+  FaInfinity,
+  FaArrowRight,
+  FaUser,
+  FaCog,
+  FaSignOutAlt,
+  FaPlus,
+  FaMinus,
+  FaSpinner,
+  FaEye,
+  FaCalendarAlt
+} from 'react-icons/fa';
+import { TbChefHat } from 'react-icons/tb';
+import Header from '../components/Header';
+import PremiumModal from "../components/PremiumModal";
+import { usePremiumModal } from "../hooks/usePremiumModal";
+import { auth, db } from '../firebaseConfigFront';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import HoroscopeCard from '../components/HoroscopeCard'
 import QuickAccessCard from '../components/QuickAccessCard'
-import { FaStar, FaEye, FaCalendarAlt } from 'react-icons/fa'
-import { TbChefHat } from 'react-icons/tb';
-import { useNavigate } from 'react-router-dom'
 
 function getSign(day, month) {
   const signs = [
@@ -171,6 +188,13 @@ export default function Home() {
   const [signo, setSigno] = useState('');
   const [signoEn, setSignoEn] = useState('');
 
+  // Hook do modal premium para onboarding
+  const { 
+    showModal: showPremiumModal, 
+    handleCloseModal, 
+    handleSubscribe 
+  } = usePremiumModal();
+
   // Limpeza automática do cache expirado
   useEffect(() => {
     const cleanupCache = () => {
@@ -249,7 +273,7 @@ export default function Home() {
           }
           
           // Salvar todos os dados de uma vez
-          await setDoc(userRef, dadosBasicos, { merge: true });
+          await updateDoc(userRef, dadosBasicos);
           
           const dataNasc = userData.dataNascimento;
           const signSalvo = userData.sign; // Campo signo salvo no Firebase
@@ -269,19 +293,19 @@ export default function Home() {
               setSignoEn(signObj.en);
               
               // Salva o signo no Firebase
-              await setDoc(userRef, { sign: signObj.en }, { merge: true });
+              await updateDoc(userRef, { sign: signObj.en });
             }
           }
           if (!dataNasc) setShowModal(true);
         } else {
           // Usuário completamente novo - criar documento com dados completos
           console.log("👤 Usuário completamente novo! Criando documento com 5 créditos");
-          await setDoc(userRef, {
+          await updateDoc(userRef, {
             nome: firebaseUser.displayName || "",
             email: firebaseUser.email || "",
             foto: firebaseUser.photoURL || "",
             creditos: 5
-          }, { merge: true });
+          });
           setCreditos(5);
           setShowModal(true);
         }
@@ -318,7 +342,7 @@ export default function Home() {
       setCreditos(5);
     }
     
-    await setDoc(userRef, dadosParaSalvar, { merge: true });
+    await updateDoc(userRef, dadosParaSalvar);
     
     // Atualizar o estado local
     setSigno(signObj.sign);
@@ -406,6 +430,13 @@ export default function Home() {
           <span>Converse com a CatIA</span>
         </button>
       </div>
+
+      {/* Modal Premium para Onboarding */}
+      <PremiumModal
+        isOpen={showPremiumModal}
+        onClose={handleCloseModal}
+        onSubscribe={handleSubscribe}
+      />
     </div>
   )
 }

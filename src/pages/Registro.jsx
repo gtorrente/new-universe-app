@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { createUserWithEmailAndPassword, updateProfile, sendEmailVerification } from "firebase/auth";
 import { auth, db } from "../firebaseConfigFront";
 import { doc, setDoc } from "firebase/firestore";
 import { EyeIcon, EyeSlashIcon, EnvelopeIcon, LockClosedIcon, CalendarIcon, UserIcon } from "@heroicons/react/24/outline";
@@ -74,6 +74,7 @@ export default function Registro() {
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, senha);
       await updateProfile(userCredential.user, { displayName: nome });
+      await sendEmailVerification(userCredential.user);
       
       // Calcular o signo baseado na data de nascimento
       const [, mes, dia] = nascimento.split('-').map(Number);

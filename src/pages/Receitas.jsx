@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import { TbChefHat, TbLock, TbStar, TbHeart, TbArrowRight } from 'react-icons/tb';
 import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
+import PremiumModal from '../components/PremiumModal';
 import { auth, db } from '../firebaseConfigFront';
 import { doc, getDoc, collection, getDocs } from 'firebase/firestore';
 // import receitasData from '../data/receitas.json'; // Não usado mais
@@ -18,6 +19,9 @@ export default function Receitas() {
   const [creditos, setCreditos] = useState(0);
   const [categorias, setCategorias] = useState([]);
   const [loadingCategorias, setLoadingCategorias] = useState(true);
+
+  // Estado do modal premium
+  const [showPremiumModal, setShowPremiumModal] = useState(false);
 
   // Efeito para buscar usuário autenticado e créditos no Firestore
   useEffect(() => {
@@ -111,6 +115,22 @@ export default function Receitas() {
     }
     fetchCategorias();
   }, []);
+
+  // Funções do modal premium
+  const handleOpenPremiumModal = () => {
+    setShowPremiumModal(true);
+  };
+
+  const handleClosePremiumModal = () => {
+    setShowPremiumModal(false);
+  };
+
+  const handleSubscribe = (planType) => {
+    console.log('Usuário quer assinar:', planType);
+    // Aqui você pode integrar com o sistema de pagamento
+    handleClosePremiumModal();
+    return { planType, userId: user?.uid };
+  };
 
   // Dados da receita em destaque (gratuita)
   const receitaDestaque = {
@@ -289,7 +309,10 @@ export default function Receitas() {
             </div>
 
             {/* Botão de assinatura */}
-            <button className="w-full bg-white text-purple-600 py-3 rounded-xl font-semibold hover:bg-gray-50 transition-all duration-300">
+            <button 
+              onClick={handleOpenPremiumModal}
+              className="w-full bg-white text-purple-600 py-3 rounded-xl font-semibold hover:bg-gray-50 transition-all duration-300"
+            >
               Assinar Universo+
             </button>
           </div>
@@ -301,6 +324,13 @@ export default function Receitas() {
             Algumas receitas são só pra quem faz parte do Universo+. Mas não se preocupe, tem sempre uma delícia esperando por você.
           </p>
         </div>
+
+        {/* Modal Premium */}
+        <PremiumModal
+          isOpen={showPremiumModal}
+          onClose={handleClosePremiumModal}
+          onSubscribe={handleSubscribe}
+        />
       </div>
     </div>
   );

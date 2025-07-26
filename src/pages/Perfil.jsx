@@ -21,7 +21,8 @@ import {
   FaEdit,
   FaSpinner,
   FaCheck,
-  FaExclamationTriangle
+  FaExclamationTriangle,
+  FaCoins
 } from "react-icons/fa";
 import Header from "../components/Header";
 import { CardLoading, PageLoading } from "../components/LoadingStates";
@@ -349,6 +350,22 @@ export default function Perfil() {
                     <FaEdit size={20} className="text-blue-600" />
                   </div>
                   <span className="text-gray-700 font-medium">Editar Dados Pessoais</span>
+                </div>
+                <FaChevronRight size={16} className="text-gray-400" />
+              </button>
+
+              <button 
+                onClick={() => navigate('/comprar-creditos')}
+                className="w-full flex items-center justify-between p-4 hover:bg-green-50 transition group"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-green-100 rounded-lg group-hover:bg-green-200 transition">
+                    <FaCoins size={20} className="text-green-600" />
+                  </div>
+                  <div className="text-left">
+                    <span className="text-gray-700 font-medium block">Comprar Créditos</span>
+                    <span className="text-xs text-gray-500">Saldo atual: {creditos} créditos</span>
+                  </div>
                 </div>
                 <FaChevronRight size={16} className="text-gray-400" />
               </button>

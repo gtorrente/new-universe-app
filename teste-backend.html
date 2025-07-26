@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Backend Mercado Pago</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; max-width: 800px; margin: 0 auto; }
+        .test-section { background: #f5f5f5; padding: 15px; margin: 10px 0; border-radius: 8px; }
+        .success { background: #d4edda; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; border: 1px solid #f5c6cb; }
+        button { background: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; margin: 5px; }
+        button:hover { background: #0056b3; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 4px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Teste do Sistema Mercado Pago</h1>
+    
+    <div class="test-section">
+        <h3>1. Teste de Conectividade com Backend</h3>
+        <button onclick="testarBackend()">Testar Backend (localhost:3001)</button>
+        <div id="result-backend"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>2. Teste de Criação de Preference</h3>
+        <button onclick="testarPreference()">Criar Preference de Teste</button>
+        <div id="result-preference"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>3. Teste de Pagamento Simulado</h3>
+        <button onclick="testarPagamento()">Simular Pagamento</button>
+        <div id="result-pagamento"></div>
+    </div>
+
+    <script>
+        async function testarBackend() {
+            const resultDiv = document.getElementById('result-backend');
+            resultDiv.innerHTML = '<p>⏳ Testando conectividade...</p>';
+            
+            try {
+                // Testar se backend está rodando
+                const response = await fetch('http://localhost:3001/api/mercado-pago/create-preference', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        items: [{ 
+                            title: 'Teste',
+                            unit_price: 10.00,
+                            quantity: 1
+                        }],
+                        payer: { email: 'teste@exemplo.com' }
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    resultDiv.innerHTML = `
+                        <div class="success">
+                            <h4>✅ Backend funcionando!</h4>
+                            <pre>${JSON.stringify(data, null, 2)}</pre>
+                        </div>
+                    `;
+                } else {
+                    const error = await response.text();
+                    resultDiv.innerHTML = `
+                        <div class="error">
+                            <h4>❌ Erro no backend (${response.status})</h4>
+                            <pre>${error}</pre>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <h4>❌ Erro de conexão</h4>
+                        <p>Backend não está rodando em localhost:3001</p>
+                        <pre>${error.message}</pre>
+                    </div>
+                `;
+            }
+        }
+        
+        async function testarPreference() {
+            const resultDiv = document.getElementById('result-preference');
+            resultDiv.innerHTML = '<p>⏳ Criando preference...</p>';
+            
+            try {
+                const response = await fetch('http://localhost:3001/api/mercado-pago/create-preference', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        items: [{
+                            title: 'Pacote Essencial - 10 créditos',
+                            description: '10 créditos para o Universo Catia',
+                            unit_price: 19.90,
+                            quantity: 1,
+                        }],
+                        payer: { email: 'teste@universo-catia.com' },
+                        metadata: {
+                            user_id: 'teste-123',
+                            package_id: 'essencial',
+                            credits: 10,
+                        },
+                        notification_url: 'http://localhost:3001/api/mercado-pago/webhook',
+                        back_urls: {
+                            success: 'http://localhost:5173/pagamento-sucesso',
+                            failure: 'http://localhost:5173/pagamento-falha',
+                            pending: 'http://localhost:5173/pagamento-pendente',
+                        },
+                        auto_return: 'approved',
+                    })
+                });
+                
+                const data = await response.json();
+                if (response.ok) {
+                    resultDiv.innerHTML = `
+                        <div class="success">
+                            <h4>✅ Preference criada com sucesso!</h4>
+                            <p><strong>ID:</strong> ${data.id}</p>
+                            <p><strong>Link de pagamento:</strong> <a href="${data.init_point}" target="_blank">${data.init_point}</a></p>
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="error">
+                            <h4>❌ Erro ao criar preference</h4>
+                            <pre>${JSON.stringify(data, null, 2)}</pre>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <h4>❌ Erro de conexão</h4>
+                        <pre>${error.message}</pre>
+                    </div>
+                `;
+            }
+        }
+        
+        async function testarPagamento() {
+            const resultDiv = document.getElementById('result-pagamento');
+            resultDiv.innerHTML = '<p>⏳ Testando processamento de pagamento...</p>';
+            
+            try {
+                const response = await fetch('http://localhost:3001/api/mercado-pago/process-payment', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        selectedPaymentMethod: 'pix',
+                        formData: {
+                            payer: { email: 'teste@universo-catia.com' }
+                        },
+                        userId: 'teste-123',
+                        packageData: {
+                            id: 'essencial',
+                            name: 'Pacote Essencial',
+                            credits: 10,
+                            price: 19.90
+                        }
+                    })
+                });
+                
+                const data = await response.json();
+                if (response.ok) {
+                    resultDiv.innerHTML = `
+                        <div class="success">
+                            <h4>✅ Pagamento processado!</h4>
+                            <p><strong>Status:</strong> ${data.status}</p>
+                            <p><strong>ID:</strong> ${data.id}</p>
+                            ${data.point_of_interaction ? `<p><strong>QR Code PIX:</strong> Disponível</p>` : ''}
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="error">
+                            <h4>❌ Erro no pagamento</h4>
+                            <pre>${JSON.stringify(data, null, 2)}</pre>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <h4>❌ Erro de conexão</h4>
+                        <pre>${error.message}</pre>
+                    </div>
+                `;
+            }
+        }
+        
+        // Testar automaticamente ao carregar
+        window.onload = () => {
+            console.log('🧪 Página de teste carregada');
+            testarBackend();
+        };
+    </script>
+</body>
+</html> 
