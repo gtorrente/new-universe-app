@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { auth, db } from '../firebaseConfigFront';
 import { doc, setDoc, deleteDoc, getDoc } from 'firebase/firestore';
 
-export default function CategoriaReceitasPage({ titulo, descricao, emoji, receitas, onVoltar }) {
+export default function CategoriaReceitasPage({ titulo, descricao, emoji, receitas, onVoltar, onPremiumClick }) {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [favoritos, setFavoritos] = useState({}); // { [receitaId]: true }
@@ -82,7 +82,7 @@ export default function CategoriaReceitasPage({ titulo, descricao, emoji, receit
               className={`relative group rounded-2xl overflow-hidden shadow-lg bg-white transition-all duration-300 cursor-pointer hover:scale-105 ${r.premium ? 'opacity-80' : ''}`}
               onClick={() => {
                 if (r.premium) {
-                  alert('Receita premium! Em breve você poderá desbloquear.');
+                  onPremiumClick();
                   return;
                 }
                 if (r.id) navigate(`/receita/${r.id}`);

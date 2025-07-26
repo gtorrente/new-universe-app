@@ -24,6 +24,8 @@ import NotificationsAdmin from './pages/admin/NotificationsAdmin';
 import ReceitasSalvas from './pages/ReceitasSalvas';
 import MinhasConversas from './pages/MinhasConversas';
 import Configuracoes from './pages/Configuracoes';
+import ComprarCreditos from './pages/ComprarCreditos';
+import CheckoutPagamento from './pages/CheckoutPagamento';
 
 import BottomNav from './components/BottomNav'
 
@@ -188,6 +190,22 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <Configuracoes />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/comprar-creditos"
+            element={
+              <ProtectedRoute>
+                <ComprarCreditos />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/checkout-pagamento"
+            element={
+              <ProtectedRoute>
+                <CheckoutPagamento />
               </ProtectedRoute>
             }
           />
