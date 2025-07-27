@@ -28,6 +28,7 @@ app.use(express.json());
 // Rota para criar preference de pagamento
 app.post('/api/mercado-pago/create-preference', async (req, res) => {
   try {
+    console.log('📦 Recebendo dados:', req.body);
     const { items, payer, metadata, notification_url, back_urls } = req.body;
 
     const preferenceData = {
@@ -40,7 +41,9 @@ app.post('/api/mercado-pago/create-preference', async (req, res) => {
       statement_descriptor: 'UNIVERSO CATIA'
     };
 
+    console.log('🚀 Criando preference com dados:', preferenceData);
     const result = await preference.create({ body: preferenceData });
+    console.log('✅ Preference criada com sucesso:', result.id);
     
     res.json({
       id: result.id,
@@ -48,8 +51,12 @@ app.post('/api/mercado-pago/create-preference', async (req, res) => {
       sandbox_init_point: result.sandbox_init_point
     });
   } catch (error) {
-    console.error('Erro ao criar preference:', error);
-    res.status(500).json({ error: 'Erro interno do servidor' });
+    console.error('❌ Erro ao criar preference:', error.message);
+    console.error('🔍 Detalhes do erro:', error);
+    res.status(500).json({ 
+      error: 'Erro interno do servidor',
+      details: error.message
+    });
   }
 });
 

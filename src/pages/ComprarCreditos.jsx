@@ -6,8 +6,6 @@ import {
   FaCoins, 
   FaStar, 
   FaCheck, 
-  FaCreditCard,
-  FaQrcode,
   FaSpinner,
   FaGem
 } from 'react-icons/fa';
@@ -32,7 +30,6 @@ const ComprarCreditos = () => {
   const [user, setUser] = useState(null);
   const [creditos, setCreditos] = useState(0);
   const [selectedPackage, setSelectedPackage] = useState('essencial');
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('pix'); // Novo estado
 
   // Inicializar Mercado Pago quando o componente monta
   useEffect(() => {
@@ -109,12 +106,11 @@ const ComprarCreditos = () => {
     
     console.log('🚀 Iniciando compra:', {
       package: selectedPkg,
-      paymentMethod: selectedPaymentMethod,
       user: user.email
     });
     
     try {
-      // Navegar para página de checkout com os dados do pacote e método de pagamento
+      // Navegar para página de checkout com os dados do pacote
       navigate('/checkout-pagamento', {
         state: {
           packageData: {
@@ -124,7 +120,6 @@ const ComprarCreditos = () => {
             price: selectedPkg.price,
             description: selectedPkg.description
           },
-          paymentMethod: selectedPaymentMethod,
           user: {
             uid: user.uid,
             email: user.email,
@@ -252,55 +247,6 @@ const ComprarCreditos = () => {
           ))}
         </div>
 
-        {/* Métodos de Pagamento */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className="bg-white rounded-2xl p-6 mb-6 border border-gray-200"
-        >
-          <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
-            <FaCreditCard className="text-purple-500" />
-            Métodos de Pagamento
-          </h3>
-          <div className="grid grid-cols-2 gap-4">
-            <button
-              onClick={() => setSelectedPaymentMethod('pix')}
-              className={`flex items-center gap-3 p-3 rounded-xl transition-all ${
-                selectedPaymentMethod === 'pix'
-                  ? 'bg-blue-100 border-2 border-blue-500 ring-2 ring-blue-200'
-                  : 'bg-blue-50 border-2 border-transparent hover:bg-blue-100'
-              }`}
-            >
-              <FaQrcode className="text-blue-500" size={20} />
-              <div className="text-left">
-                <p className="font-medium text-gray-800">PIX</p>
-                <p className="text-xs text-gray-600">Aprovação instantânea</p>
-              </div>
-              {selectedPaymentMethod === 'pix' && (
-                <FaCheck className="ml-auto text-blue-500" size={16} />
-              )}
-            </button>
-            <button
-              onClick={() => setSelectedPaymentMethod('card')}
-              className={`flex items-center gap-3 p-3 rounded-xl transition-all ${
-                selectedPaymentMethod === 'card'
-                  ? 'bg-green-100 border-2 border-green-500 ring-2 ring-green-200'
-                  : 'bg-green-50 border-2 border-transparent hover:bg-green-100'
-              }`}
-            >
-              <FaCreditCard className="text-green-500" size={20} />
-              <div className="text-left">
-                <p className="font-medium text-gray-800">Cartão</p>
-                <p className="text-xs text-gray-600">Crédito ou débito</p>
-              </div>
-              {selectedPaymentMethod === 'card' && (
-                <FaCheck className="ml-auto text-green-500" size={16} />
-              )}
-            </button>
-          </div>
-        </motion.div>
-
         {/* Botão de Compra */}
         <motion.button
           initial={{ opacity: 0, y: 20 }}
@@ -319,30 +265,11 @@ const ComprarCreditos = () => {
             <>
               Comprar {packages.find(pkg => pkg.id === selectedPackage)?.credits} créditos
               por R$ {packages.find(pkg => pkg.id === selectedPackage)?.price.toFixed(2).replace('.', ',')}
-              via {selectedPaymentMethod === 'pix' ? 'PIX' : 'Cartão'}
             </>
           )}
         </motion.button>
 
-        {/* Botão de Teste Temporário */}
-        <motion.button
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6 }}
-          onClick={() => {
-            console.log('🧪 Teste de navegação simples');
-            navigate('/checkout-pagamento', {
-              state: {
-                packageData: { id: 'teste', name: 'Teste', credits: 5, price: 10.00 },
-                paymentMethod: 'pix',
-                user: { uid: 'teste', email: 'teste@teste.com', displayName: 'Teste' }
-              }
-            });
-          }}
-          className="w-full bg-orange-500 text-white font-bold py-2 rounded-xl mb-4 hover:bg-orange-600 transition"
-        >
-          🧪 TESTE NAVEGAÇÃO (Temporário)
-        </motion.button>
+
 
         {/* Informações Adicionais */}
         <motion.div
