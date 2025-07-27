@@ -95,9 +95,17 @@ const ComprarCreditos = () => {
   }, []);
 
   const handlePurchase = async () => {
-    if (!user) return;
+    if (!user) {
+      alert('❌ Usuário não encontrado!');
+      return;
+    }
     
     const selectedPkg = packages.find(pkg => pkg.id === selectedPackage);
+    
+    if (!selectedPkg) {
+      alert('❌ Pacote não encontrado!');
+      return;
+    }
     
     console.log('🚀 Iniciando compra:', {
       package: selectedPkg,
@@ -105,14 +113,29 @@ const ComprarCreditos = () => {
       user: user.email
     });
     
-    // Navegar para página de checkout com os dados do pacote e método de pagamento
-    navigate('/checkout-pagamento', {
-      state: {
-        packageData: selectedPkg,
-        paymentMethod: selectedPaymentMethod,
-        user: user
-      }
-    });
+    try {
+      // Navegar para página de checkout com os dados do pacote e método de pagamento
+      navigate('/checkout-pagamento', {
+        state: {
+          packageData: {
+            id: selectedPkg.id,
+            name: selectedPkg.name,
+            credits: selectedPkg.credits,
+            price: selectedPkg.price,
+            description: selectedPkg.description
+          },
+          paymentMethod: selectedPaymentMethod,
+          user: {
+            uid: user.uid,
+            email: user.email,
+            displayName: user.displayName || 'Usuário'
+          }
+        }
+      });
+    } catch (error) {
+      console.error('❌ Erro ao navegar:', error);
+      alert('Erro ao processar compra. Tente novamente.');
+    }
   };
 
   return (
@@ -301,11 +324,31 @@ const ComprarCreditos = () => {
           )}
         </motion.button>
 
+        {/* Botão de Teste Temporário */}
+        <motion.button
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 }}
+          onClick={() => {
+            console.log('🧪 Teste de navegação simples');
+            navigate('/checkout-pagamento', {
+              state: {
+                packageData: { id: 'teste', name: 'Teste', credits: 5, price: 10.00 },
+                paymentMethod: 'pix',
+                user: { uid: 'teste', email: 'teste@teste.com', displayName: 'Teste' }
+              }
+            });
+          }}
+          className="w-full bg-orange-500 text-white font-bold py-2 rounded-xl mb-4 hover:bg-orange-600 transition"
+        >
+          🧪 TESTE NAVEGAÇÃO (Temporário)
+        </motion.button>
+
         {/* Informações Adicionais */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.6 }}
+          transition={{ delay: 0.7 }}
           className="mt-6 text-center"
         >
           <p className="text-xs text-gray-500">
