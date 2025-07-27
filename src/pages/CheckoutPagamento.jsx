@@ -49,7 +49,7 @@ const CheckoutPagamento = () => {
       const script = document.createElement('script');
       script.src = 'https://sdk.mercadopago.com/js/v2';
       script.onload = () => {
-        const publicKey = import.meta.env.VITE_MERCADOPAGO_PUBLIC_KEY || 'APP_USR-308540b4-ad3b-4e6e-b167-31bf761ac177';
+        const publicKey = import.meta.env.VITE_MERCADOPAGO_PUBLIC_KEY_TEST || 'TEST-97acbda3-ba7d-4786-a525-c40c19f88843';
         if (window.MercadoPago) {
           window.mp = new window.MercadoPago(publicKey);
           setMpLoaded(true);

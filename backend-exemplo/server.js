@@ -11,7 +11,7 @@ const PORT = process.env.PORT || 3001;
 
 // Configuração do Mercado Pago com suas credenciais
 const client = new MercadoPagoConfig({
-  accessToken: 'APP_USR-5236189943574221-031723-12016251c249e02b0836c2c14a624eec-47637780',
+  accessToken: 'TEST-6756611187520583-072523-4c3229768706ed16219da6958c53f4c4-47637780',
   options: {
     timeout: 5000,
     idempotencyKey: 'abc'
