@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import { auth, db } from "../firebaseConfigFront";
 import { doc, getDoc } from "firebase/firestore";
+import horoscopoMock from "../services/horoscopoMock";
 import { FaStar, FaRegPlayCircle, FaRegEdit, FaRegHeart } from 'react-icons/fa';
 import { BsFillSunFill, BsFillMoonStarsFill } from 'react-icons/bs';
 import { GiPlanetConquest } from 'react-icons/gi';
@@ -200,10 +201,14 @@ export default function PrevisaoSemanal() {
       setLoading(true);
       setError(null);
       
-      console.log("🌐 Previsão: Fazendo chamada para API com signo:", signo);
-      console.log("🌐 Previsão: URL da API:", `${import.meta.env.VITE_API_URL}/horoscopo-semanal`);
+      // Verificar se VITE_API_URL está configurada
+      const apiUrl = import.meta.env.VITE_API_URL || 'https://api.torrente.com.br';
+      console.log('🌐 Previsão: Usando API URL:', apiUrl);
       
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/horoscopo-semanal`, {
+      console.log("🌐 Previsão: Fazendo chamada para API com signo:", signo);
+      console.log("🌐 Previsão: URL da API:", `${apiUrl}/horoscopo-semanal`);
+      
+      const res = await fetch(`${apiUrl}/horoscopo-semanal`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ sign: signo })
@@ -249,7 +254,31 @@ export default function PrevisaoSemanal() {
       
     } catch (err) {
       console.error("Erro ao buscar horóscopo semanal:", err);
-      setError("Não foi possível carregar a previsão semanal. Tente novamente.");
+      console.log('🔄 API fora do ar - Usando previsão mock temporário');
+      
+      // MOCK TEMPORÁRIO - Remover quando api.torrente.com.br voltar a funcionar
+      try {
+        const mockData = horoscopoMock.gerarPrevisaoSemanal(signo);
+        
+        const semanaFormatada = [
+          { dia: "Seg", ...mockData.semana.segunda },
+          { dia: "Ter", ...mockData.semana.terca },
+          { dia: "Qua", ...mockData.semana.quarta },
+          { dia: "Qui", ...mockData.semana.quinta },
+          { dia: "Sex", ...mockData.semana.sexta },
+          { dia: "Sáb", ...mockData.semana.sabado },
+          { dia: "Dom", ...mockData.semana.domingo }
+        ];
+
+        setDestaque(mockData.destaque);
+        setSemana(semanaFormatada);
+        setMensagemAudioCatia(mockData.destaque.mensagem_audio_catia);
+        setError(null);
+        console.log('✅ Previsão mock carregada com sucesso (temporário)');
+      } catch (mockErr) {
+        console.error("Erro no mock:", mockErr);
+        setError("Serviço temporariamente indisponível. Tente novamente em alguns minutos.");
+      }
     } finally {
       setLoading(false);
     }
