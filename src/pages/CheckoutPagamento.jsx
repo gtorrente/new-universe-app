@@ -165,7 +165,7 @@ const CheckoutPagamento = () => {
             package_id: packageData.id,
             credits: packageData.credits,
           },
-          notification_url: `http://localhost:3001/api/mercado-pago/webhook`,
+          notification_url: `https://api.torrente.com.br/api/mercado-pago/webhook`,
           back_urls: {
             success: `${window.location.origin}/pagamento-sucesso`,
             failure: `${window.location.origin}/pagamento-falha`,
@@ -178,7 +178,8 @@ const CheckoutPagamento = () => {
       console.log('📡 Resposta do backend:', response.status);
 
       if (!response.ok) {
-        throw new Error('Erro ao criar preference');
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(`Erro ao criar preference: ${response.status} - ${errorData.details || 'Erro desconhecido'}`);
       }
 
       return await response.json();
@@ -206,6 +207,11 @@ const CheckoutPagamento = () => {
         }),
       });
 
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(`Erro ao processar pagamento: ${response.status} - ${errorData.details || 'Erro desconhecido'}`);
+      }
+      
       const result = await response.json();
       
       if (result.status === 'approved') {
