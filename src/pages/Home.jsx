@@ -28,7 +28,7 @@ import { auth, db } from '../firebaseConfigFront';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import HoroscopeCard from '../components/HoroscopeCard'
 import QuickAccessCard from '../components/QuickAccessCard'
-import horoscopoMock from '../services/horoscopoMock';
+
 
 function getSign(day, month) {
   const signs = [
@@ -168,19 +168,8 @@ function useHoroscopo(signoEn) {
       
     } catch (err) {
       console.error("Erro ao buscar horóscopo diário:", err);
-      console.log('🔄 API fora do ar - Usando horóscopo mock temporário');
-      
-      // MOCK TEMPORÁRIO - Remover quando api.torrente.com.br voltar a funcionar
-      try {
-        const mockData = horoscopoMock.gerarHoroscopoDiario(signo);
-        setHoroscopo(mockData.horoscopo);
-        setError(null);
-        console.log('✅ Horóscopo mock carregado com sucesso (temporário)');
-      } catch (mockErr) {
-        console.error("Erro no mock:", mockErr);
-        setError("Serviço temporariamente indisponível. Tente novamente em alguns minutos.");
-        setHoroscopo("Horóscopo temporariamente indisponível.");
-      }
+      setError("Não foi possível carregar o horóscopo hoje.");
+      setHoroscopo("Horóscopo temporariamente indisponível.");
     } finally {
       setLoading(false);
     }

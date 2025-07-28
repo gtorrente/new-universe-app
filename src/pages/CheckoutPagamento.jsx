@@ -145,7 +145,7 @@ const CheckoutPagamento = () => {
       });
 
       // BACKEND REAL HABILITADO
-      const response = await fetch('http://localhost:3001/api/mercado-pago/create-preference', {
+      const response = await fetch('https://api.torrente.com.br/api/mercado-pago/create-preference', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -192,7 +192,7 @@ const CheckoutPagamento = () => {
     setLoading(true);
     
     try {
-      const response = await fetch('http://localhost:3001/api/mercado-pago/process-payment', {
+      const response = await fetch('https://api.torrente.com.br/api/mercado-pago/process-payment', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

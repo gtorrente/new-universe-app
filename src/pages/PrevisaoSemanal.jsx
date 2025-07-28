@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import { auth, db } from "../firebaseConfigFront";
 import { doc, getDoc } from "firebase/firestore";
-import horoscopoMock from "../services/horoscopoMock";
+
 import { FaStar, FaRegPlayCircle, FaRegEdit, FaRegHeart } from 'react-icons/fa';
 import { BsFillSunFill, BsFillMoonStarsFill } from 'react-icons/bs';
 import { GiPlanetConquest } from 'react-icons/gi';
@@ -254,31 +254,7 @@ export default function PrevisaoSemanal() {
       
     } catch (err) {
       console.error("Erro ao buscar horóscopo semanal:", err);
-      console.log('🔄 API fora do ar - Usando previsão mock temporário');
-      
-      // MOCK TEMPORÁRIO - Remover quando api.torrente.com.br voltar a funcionar
-      try {
-        const mockData = horoscopoMock.gerarPrevisaoSemanal(signo);
-        
-        const semanaFormatada = [
-          { dia: "Seg", ...mockData.semana.segunda },
-          { dia: "Ter", ...mockData.semana.terca },
-          { dia: "Qua", ...mockData.semana.quarta },
-          { dia: "Qui", ...mockData.semana.quinta },
-          { dia: "Sex", ...mockData.semana.sexta },
-          { dia: "Sáb", ...mockData.semana.sabado },
-          { dia: "Dom", ...mockData.semana.domingo }
-        ];
-
-        setDestaque(mockData.destaque);
-        setSemana(semanaFormatada);
-        setMensagemAudioCatia(mockData.destaque.mensagem_audio_catia);
-        setError(null);
-        console.log('✅ Previsão mock carregada com sucesso (temporário)');
-      } catch (mockErr) {
-        console.error("Erro no mock:", mockErr);
-        setError("Serviço temporariamente indisponível. Tente novamente em alguns minutos.");
-      }
+      setError("Não foi possível carregar a previsão semanal. Tente novamente.");
     } finally {
       setLoading(false);
     }

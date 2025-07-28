@@ -64,18 +64,31 @@ app.post('/api/mercado-pago/create-preference', async (req, res) => {
 // Rota para processar pagamento direto (Payment Brick)
 app.post('/api/mercado-pago/process-payment', async (req, res) => {
   try {
+    console.log('💳 Recebendo dados de pagamento:', req.body);
     const { selectedPaymentMethod, formData, userId, packageData } = req.body;
 
+    // Validações básicas
+    if (!formData || !packageData || !userId) {
+      throw new Error('Dados obrigatórios não fornecidos');
+    }
+
+    // Extrair payment_method_id do formData se não estiver em selectedPaymentMethod
+    const paymentMethodId = selectedPaymentMethod || formData.payment_method_id;
+    
+    if (!paymentMethodId) {
+      throw new Error('Método de pagamento não identificado');
+    }
+
     const paymentData = {
-      transaction_amount: packageData.price,
+      transaction_amount: parseFloat(packageData.price),
       token: formData.token || undefined,
       description: `${packageData.name} - ${packageData.credits} créditos`,
-      installments: formData.installments || 1,
-      payment_method_id: selectedPaymentMethod,
+      installments: parseInt(formData.installments) || 1,
+      payment_method_id: paymentMethodId,
       issuer_id: formData.issuer_id || undefined,
       payer: {
-        email: formData.payer?.email,
-        identification: formData.payer?.identification || undefined,
+        email: formData.payer?.email || formData.email,
+        identification: formData.payer?.identification || formData.identification || undefined,
       },
       metadata: {
         user_id: userId,
@@ -84,8 +97,10 @@ app.post('/api/mercado-pago/process-payment', async (req, res) => {
       }
     };
 
+    console.log('🚀 Dados de pagamento preparados:', paymentData);
+
     // Processar pagamento PIX
-    if (selectedPaymentMethod === 'pix') {
+    if (paymentMethodId === 'pix') {
       paymentData.payment_method_id = 'pix';
       delete paymentData.token;
       delete paymentData.installments;
@@ -102,8 +117,15 @@ app.post('/api/mercado-pago/process-payment', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Erro ao processar pagamento:', error);
-    res.status(500).json({ error: 'Erro interno do servidor' });
+    console.error('❌ Erro ao processar pagamento:', error.message);
+    console.error('🔍 Detalhes completos do erro:', error);
+    console.error('📦 Dados recebidos:', req.body);
+    
+    res.status(500).json({ 
+      error: 'Erro interno do servidor',
+      details: error.message,
+      code: error.code || 'UNKNOWN_ERROR'
+    });
   }
 });
 

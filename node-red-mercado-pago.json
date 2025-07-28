@@ -1,0 +1,26 @@
+{
+  "endpoints": [
+    {
+      "name": "Create Preference",
+      "method": "POST",
+      "path": "/api/mercado-pago/create-preference",
+      "description": "Cria preferência de pagamento no Mercado Pago"
+    },
+    {
+      "name": "Process Payment", 
+      "method": "POST",
+      "path": "/api/mercado-pago/process-payment",
+      "description": "Processa pagamento via Payment Brick"
+    },
+    {
+      "name": "Webhook",
+      "method": "POST", 
+      "path": "/api/mercado-pago/webhook",
+      "description": "Recebe notificações do Mercado Pago"
+    }
+  ],
+  "environment_variables": {
+    "MERCADOPAGO_ACCESS_TOKEN": "TEST-6756611187520583-072523-4c3229768706ed16219da6958c53f4c4-47637780",
+    "MERCADOPAGO_PUBLIC_KEY": "TEST-308540b4-ad3b-4e6e-b167-31bf761ac177"
+  }
+} 
