@@ -473,7 +473,7 @@ export default function PrevisaoSemanal() {
               ) : (
                 <>
                   <FaRegPlayCircle className="text-xl" /> 
-                  {audioElement ? "Continuar áudio" : "Ouvir a previsão da semana com a voz da CatIA"}
+                  {audioElement ? "Continuar áudio" : "Ouça um recadinho da Catia para essa semana"}
                 </>
               )}
             </button>
