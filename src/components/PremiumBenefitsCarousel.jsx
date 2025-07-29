@@ -46,17 +46,6 @@ const premiumBenefitsData = [
     bgGradient: "from-yellow-50 to-orange-100",
     exclusiveTag: "BENEFÍCIO PREMIUM"
   }
-  // {
-  //   id: 5,
-  //   image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=240&fit=crop&auto=format",
-  //   title: "Universo Premium",
-  //   description: "Acesso completo a tudo — sem limites, só magia e crescimento",
-  //   buttonText: "Assinar agora",
-  //   gradient: "from-indigo-600 to-purple-600",
-  //   bgGradient: "from-indigo-50 to-purple-100",
-  //   // isSpecial: true,
-  //   exclusiveTag: "MAIS POPULAR"
-  // }
 ];
 
 const PremiumBenefitCard = ({ benefit, onClick }) => {
@@ -148,44 +137,52 @@ const PremiumBenefitsCarousel = ({ onSubscribeClick }) => {
     }
   };
 
-  // Configurar scroll suave e fluido
+  // Configurar scroll nativo e suave
   useEffect(() => {
     const container = scrollContainerRef.current;
     if (!container) return;
 
-    // Melhorar scroll horizontal apenas com wheel do mouse (desktop)
+    // Detectar se é dispositivo móvel
+    const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+
+    // Para desktop: melhorar scroll com wheel
     const handleWheel = (e) => {
-      // Apenas aplicar se for scroll vertical (deltaY) e não for touch device
-      if (Math.abs(e.deltaY) > Math.abs(e.deltaX) && !('ontouchstart' in window)) {
+      // Só aplicar no desktop e se for scroll vertical
+      if (!isMobile && Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
         e.preventDefault();
         
-        // Scroll mais suave e responsivo
-        const scrollAmount = e.deltaY * 0.6; // Reduzido para mais suavidade
-        const maxScrollLeft = container.scrollWidth - container.clientWidth;
-        const newScrollLeft = Math.max(0, Math.min(maxScrollLeft, container.scrollLeft + scrollAmount));
-        
-        // Usar requestAnimationFrame para scroll mais fluido
-        requestAnimationFrame(() => {
-          container.scrollLeft = newScrollLeft;
+        // Scroll muito mais suave e gradual
+        const scrollAmount = e.deltaY * 0.3; // Reduzido significativamente
+        container.scrollBy({
+          left: scrollAmount,
+          behavior: 'auto' // Removido 'smooth' para evitar conflitos
         });
       }
     };
 
     // Apenas adicionar wheel listener para desktop
-    if (!('ontouchstart' in window)) {
+    if (!isMobile) {
       container.addEventListener('wheel', handleWheel, { passive: false });
+    }
+
+    // Configurar propriedades de scroll nativo para mobile
+    if (isMobile) {
+      // Aplicar CSS para scroll nativo otimizado
+      container.style.scrollSnapType = 'x mandatory';
+      container.style.WebkitOverflowScrolling = 'touch';
+      container.style.overscrollBehaviorX = 'contain'; // Evita bounce excessivo
     }
     
     return () => {
-      if (!('ontouchstart' in window)) {
+      if (!isMobile) {
         container.removeEventListener('wheel', handleWheel);
       }
     };
   }, []);
 
   return (
-    <div className="relative overflow-hidden">
-      {/* Header da seção */}
+    <div className="w-full">
+      {/* Header da seção com margem consistente */}
       <div className="px-4 mb-6">
         <h2 className="text-2xl font-bold text-gray-800 mb-2">
           ✨ Benefícios Premium
@@ -195,22 +192,29 @@ const PremiumBenefitsCarousel = ({ onSubscribeClick }) => {
         </p>
       </div>
 
-      {/* Carrossel scrollável - otimizado para mobile */}
-      <div className="relative -mx-4">
+      {/* Carrossel scrollável - otimizado para experiência nativa */}
+      <div className="w-full">
         <div
           ref={scrollContainerRef}
-          className="flex gap-4 overflow-x-auto scrollbar-hide py-4 px-4"
+          className="flex gap-4 overflow-x-auto scrollbar-hide py-4 pl-4 pr-4"
           style={{ 
             scrollSnapType: 'x mandatory',
             WebkitOverflowScrolling: 'touch',
-            scrollBehavior: 'smooth'
+            scrollbarWidth: 'none', // Firefox
+            msOverflowStyle: 'none', // IE/Edge
+            overscrollBehaviorX: 'contain', // Evita bounce lateral excessivo
+            scrollPaddingLeft: '16px', // Padding para snap correto
+            scrollBehavior: 'auto' // Comportamento nativo
           }}
         >
-          {premiumBenefitsData.map((benefit) => (
+          {premiumBenefitsData.map((benefit, index) => (
             <div
               key={benefit.id}
               className="flex-shrink-0"
-              style={{ scrollSnapAlign: 'start' }}
+              style={{ 
+                scrollSnapAlign: index === 0 ? 'start' : 'center', // Primeiro card alinha à esquerda
+                scrollSnapStop: 'always' // Força parada em cada card
+              }}
             >
               <PremiumBenefitCard
                 benefit={benefit}
@@ -219,10 +223,24 @@ const PremiumBenefitsCarousel = ({ onSubscribeClick }) => {
             </div>
           ))}
           
-          {/* Espaçamento final para evitar cards grudarem na borda direita */}
-          <div className="flex-shrink-0 w-0"></div>
+          {/* Espaçamento final para última card não ficar grudada */}
+          <div 
+            className="flex-shrink-0 w-4" 
+            style={{ scrollSnapAlign: 'end' }}
+          ></div>
         </div>
       </div>
+
+      {/* CSS customizado para remover scrollbar completamente */}
+      <style jsx>{`
+        .scrollbar-hide {
+          -ms-overflow-style: none;  /* IE and Edge */
+          scrollbar-width: none;  /* Firefox */
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none; /* Chrome, Safari, Opera */
+        }
+      `}</style>
     </div>
   );
 };
