@@ -143,7 +143,7 @@ IMPORTANTE: Use ícones diferentes para cada dia da semana. Escolha ícones que 
         {
           role: "user", 
           content: prompt
-        }
+        } 
       ],
       temperature: 0.7,
       max_tokens: 1000
