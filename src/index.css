@@ -4,6 +4,20 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Classe para esconder scrollbar */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Adicionar classe de hover scale para compatibilidade */
+.hover\:scale-102:hover {
+  transform: scale(1.02);
+}
+
 @layer base {
   html {
     font-family: 'Neue Haas Grotesk', 'Helvetica Neue', Arial, sans-serif;

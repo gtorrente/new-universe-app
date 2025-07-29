@@ -28,6 +28,7 @@ import { auth, db } from '../firebaseConfigFront';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import HoroscopeCard from '../components/HoroscopeCard'
 import QuickAccessCard from '../components/QuickAccessCard'
+import PremiumBenefitsCarousel from '../components/PremiumBenefitsCarousel'
 
 
 function getSign(day, month) {
@@ -444,6 +445,11 @@ export default function Home() {
           <img src="/logo-ai.png" alt="CatIA" className="w-8 h-8" />
           <span>Converse com a CatIA</span>
         </button>
+      </div>
+
+      {/* Carrossel de Benefícios Premium */}
+      <div className="mt-8 mb-6">
+        <PremiumBenefitsCarousel onSubscribeClick={handleSubscribe} />
       </div>
 
       {/* Modal Premium para Onboarding */}
