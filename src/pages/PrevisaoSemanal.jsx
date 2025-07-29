@@ -4,18 +4,39 @@ import Header from "../components/Header";
 import { auth, db } from "../firebaseConfigFront";
 import { doc, getDoc } from "firebase/firestore";
 
-import { FaStar, FaRegPlayCircle, FaRegEdit, FaRegHeart } from 'react-icons/fa';
+import { FaStar, FaRegPlayCircle, FaRegEdit, FaRegHeart, FaRegSmile, FaRegLightbulb, FaRegGem, FaRegCompass, FaRegEye, FaRegHandPeace, FaRegClock, FaRegCalendarAlt, FaRegUser, FaRegBookmark, FaRegBell, FaRegGift, FaRegTrophy, FaRegFire, FaRegLeaf, FaRegWater, FaRegMountain, FaRegTree, FaRegCloud, FaRegMoon, FaRegSun } from 'react-icons/fa';
 import { BsFillSunFill, BsFillMoonStarsFill } from 'react-icons/bs';
 import { GiPlanetConquest } from 'react-icons/gi';
 
-const icones = {
-  "Intuição": <BsFillMoonStarsFill className="text-blue-400" />,
-  "Movimento": <GiPlanetConquest className="text-purple-400" />,
-  "Oportunidade": <FaStar className="text-yellow-400" />,
-  "Expansão": <BsFillSunFill className="text-orange-400" />,
-  "Afeto": <FaRegHeart className="text-pink-400" />,
-  "Reflexão": <FaRegEdit className="text-green-400" />,
-  "Descanso": <FaStar className="text-indigo-400" />
+// Mapeamento de ícones da API para componentes React
+const iconesMap = {
+  "FaStar": <FaStar className="text-yellow-400" />,
+  "FaRegHeart": <FaRegHeart className="text-pink-400" />,
+  "FaRegEdit": <FaRegEdit className="text-green-400" />,
+  "BsFillSunFill": <BsFillSunFill className="text-orange-400" />,
+  "BsFillMoonStarsFill": <BsFillMoonStarsFill className="text-blue-400" />,
+  "GiPlanetConquest": <GiPlanetConquest className="text-purple-400" />,
+  "FaRegSmile": <FaRegSmile className="text-yellow-400" />,
+  "FaRegLightbulb": <FaRegLightbulb className="text-yellow-400" />,
+  "FaRegGem": <FaRegGem className="text-purple-400" />,
+  "FaRegCompass": <FaRegCompass className="text-blue-400" />,
+  "FaRegEye": <FaRegEye className="text-indigo-400" />,
+  "FaRegHandPeace": <FaRegHandPeace className="text-green-400" />,
+  "FaRegClock": <FaRegClock className="text-gray-400" />,
+  "FaRegCalendarAlt": <FaRegCalendarAlt className="text-blue-400" />,
+  "FaRegUser": <FaRegUser className="text-purple-400" />,
+  "FaRegBookmark": <FaRegBookmark className="text-red-400" />,
+  "FaRegBell": <FaRegBell className="text-yellow-400" />,
+  "FaRegGift": <FaRegGift className="text-pink-400" />,
+  "FaRegTrophy": <FaRegTrophy className="text-yellow-400" />,
+  "FaRegFire": <FaRegFire className="text-red-400" />,
+  "FaRegLeaf": <FaRegLeaf className="text-green-400" />,
+  "FaRegWater": <FaRegWater className="text-blue-400" />,
+  "FaRegMountain": <FaRegMountain className="text-gray-400" />,
+  "FaRegTree": <FaRegTree className="text-green-400" />,
+  "FaRegCloud": <FaRegCloud className="text-gray-400" />,
+  "FaRegMoon": <FaRegMoon className="text-indigo-400" />,
+  "FaRegSun": <FaRegSun className="text-yellow-400" />
 };
 
 const nomesSignos = {
@@ -208,10 +229,9 @@ export default function PrevisaoSemanal() {
       console.log("🌐 Previsão: Fazendo chamada para API com signo:", signo);
       console.log("🌐 Previsão: URL da API:", `${apiUrl}/horoscopo-semanal`);
       
-      const res = await fetch(`${apiUrl}/horoscopo-semanal`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sign: signo })
+      const res = await fetch(`${apiUrl}/horoscopo-semanal?sign=${signo}`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" }
       });
 
       console.log("📡 Previsão: Resposta da API status:", res.status);
@@ -223,26 +243,30 @@ export default function PrevisaoSemanal() {
       const data = await res.json();
       console.log("✅ Previsão: Dados recebidos da API:", data);
       
+      if (!data.success) {
+        throw new Error(data.error || "Erro na API");
+      }
+      
       const semanaFormatada = [
-        { dia: "Seg", ...data.semana.segunda },
-        { dia: "Ter", ...data.semana.terca },
-        { dia: "Qua", ...data.semana.quarta },
-        { dia: "Qui", ...data.semana.quinta },
-        { dia: "Sex", ...data.semana.sexta },
-        { dia: "Sáb", ...data.semana.sabado },
-        { dia: "Dom", ...data.semana.domingo }
+        { dia: "Seg", ...data.data.semana.segunda },
+        { dia: "Ter", ...data.data.semana.terca },
+        { dia: "Qua", ...data.data.semana.quarta },
+        { dia: "Qui", ...data.data.semana.quinta },
+        { dia: "Sex", ...data.data.semana.sexta },
+        { dia: "Sáb", ...data.data.semana.sabado },
+        { dia: "Dom", ...data.data.semana.domingo }
       ];
 
-      setDestaque(data.destaque);
+      setDestaque(data.data.destaque);
       setSemana(semanaFormatada);
-      setMensagemAudioCatia(data.destaque?.mensagem_audio_catia || "");
+      setMensagemAudioCatia(data.data.destaque?.mensagem_audio || data.data.destaque?.mensagem || "");
 
       // 4. Salva no cache (memória + localStorage)
       const cacheData = {
         data: {
-          destaque: data.destaque,
+          destaque: data.data.destaque,
           semana: semanaFormatada,
-          mensagem_audio_catia: data.destaque?.mensagem_audio_catia || ""
+          mensagem_audio_catia: data.data.destaque?.mensagem_audio || data.data.destaque?.mensagem || ""
         },
         timestamp: Date.now()
       };
@@ -423,7 +447,7 @@ export default function PrevisaoSemanal() {
             <div className="flex gap-3 overflow-x-auto pb-2 hide-scrollbar">
               {semana.map((dia) => (
                 <div key={dia.dia} className="min-w-[140px] bg-white/90 rounded-2xl shadow-md p-4 flex flex-col items-center gap-2 border-t-4 border-purple-200">
-                  <div className="text-2xl">{icones[dia.tema] || <FaStar className="text-purple-300" />}</div>
+                  <div className="text-2xl">{iconesMap[dia.icone] || <FaStar className="text-purple-300" />}</div>
                   <div className="font-bold text-purple-700 text-base">{dia.dia}</div>
                   <div className="text-xs text-purple-400 font-semibold mb-1">{dia.tema}</div>
                   <div className="text-xs text-gray-500 text-center">{dia.trecho}</div>

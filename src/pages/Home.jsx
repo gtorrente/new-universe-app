@@ -140,10 +140,9 @@ function useHoroscopo(signoEn) {
       
       console.log('🌐 Horóscopo: Fazendo chamada para API:', `${apiUrl}/horoscopo`);
       
-      const res = await fetch(`${apiUrl}/horoscopo`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sign: signo }),
+      const res = await fetch(`${apiUrl}/horoscopo?sign=${signo}`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" }
       });
 
       if (!res.ok) {
@@ -151,7 +150,12 @@ function useHoroscopo(signoEn) {
       }
 
       const data = await res.json();
-      const horoscopoTexto = data.horoscopo || "Horóscopo indisponível.";
+      
+      if (!data.success) {
+        throw new Error(data.error || "Erro na API");
+      }
+      
+      const horoscopoTexto = data.data?.horoscopo?.mensagem || "Horóscopo indisponível.";
       
       setHoroscopo(horoscopoTexto);
 
@@ -397,7 +401,7 @@ export default function Home() {
 
       {/* Card do horóscopo do dia */}
       <div className="px-4">
-        <div className="relative">
+        <div className="relative" style={{ height: 'auto', minHeight: 'auto' }}>
           <HoroscopeCard
             sign={signo || "Seu signo"}
             energy={4}

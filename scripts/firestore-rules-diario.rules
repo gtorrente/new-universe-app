@@ -1,0 +1,27 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Regras para horóscopos diários
+    match /horoscopos_diarios/{dia}/signos/{signo} {
+      allow read: if true;  // Qualquer um pode ler
+      allow write: if true; // Qualquer um pode escrever (temporário)
+    }
+    
+    match /horoscopos_diarios/{dia}/config/{document} {
+      allow read: if true;  // Qualquer um pode ler
+      allow write: if true; // Qualquer um pode escrever (temporário)
+    }
+    
+    // Regras existentes para horóscopos semanais
+    match /horoscopos_semanais/{semana}/signos/{signo} {
+      allow read: if true;
+      allow write: if true;
+    }
+    
+    match /horoscopos_semanais/{semana}/config/{document} {
+      allow read: if true;
+      allow write: if true;
+    }
+  }
+} 

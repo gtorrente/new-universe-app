@@ -1,0 +1,40 @@
+{
+  "name": "mistic-horoscopo-scripts",
+  "version": "1.0.0",
+  "description": "Scripts para gerenciamento de horóscopos semanais no Firebase",
+  "main": "setup-firebase-horoscopo.js",
+  "scripts": {
+    "setup": "node setup-firebase-horoscopo.js",
+    "setup:criar": "node setup-firebase-horoscopo.js criar",
+    "setup:verificar": "node setup-firebase-horoscopo.js verificar",
+    "setup:limpar": "node setup-firebase-horoscopo.js limpar",
+    "gerar": "node gerar-horoscopos-semanais.js gerar",
+    "gerar:status": "node gerar-horoscopos-semanais.js status",
+    "diario:gerar": "node gerar-horoscopo-diario.js gerar",
+    "diario:status": "node gerar-horoscopo-diario.js status",
+    "diario:signo": "node gerar-horoscopo-diario.js signo",
+    "cron": "node cron-horoscopo.js executar",
+    "cron:status": "node cron-horoscopo.js status",
+    "cron:teste": "node cron-horoscopo.js teste",
+    "cron:limpar-logs": "node cron-horoscopo.js limpar-logs",
+    "configurar-cron": "bash configurar-cron.sh",
+    "test": "node test-firebase-connection.js"
+  },
+  "dependencies": {
+    "firebase": "^10.7.0",
+    "openai": "^4.20.0",
+    "node-cron": "^3.0.3",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  },
+  "keywords": [
+    "horoscopo",
+    "firebase",
+    "openai",
+    "cron"
+  ],
+  "author": "Mistic App",
+  "license": "MIT"
+} 

@@ -6,6 +6,7 @@
 - Conta no Mercado Pago com credenciais de produção
 - Firebase configurado
 
+
 ## 🔑 Suas Credenciais
 
 ```bash

@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import { 
   FaArrowLeft, 
   FaCoins, 
@@ -120,7 +119,16 @@ const CheckoutPagamento = () => {
               console.log('Payment Brick ready');
             },
             onSubmit: ({ selectedPaymentMethod, formData }) => {
-              handlePaymentSubmit(selectedPaymentMethod, formData, preference.id);
+              console.log('🧱 Dados do Brick:', {
+                selectedPaymentMethod,
+                formData,
+                token: formData.token,
+                installments: formData.installments,
+                payment_method_id: formData.payment_method_id,
+                payer: formData.payer
+              });
+              
+              handlePaymentSubmit(selectedPaymentMethod, formData);
             },
             onError: (error) => {
               console.error('Payment Brick error:', error);
@@ -189,22 +197,33 @@ const CheckoutPagamento = () => {
     }
   };
 
-  const handlePaymentSubmit = async (selectedPaymentMethod, formData, preferenceId) => {
+  const handlePaymentSubmit = async (selectedPaymentMethod, formData) => {
     setLoading(true);
     
     try {
+      // Extrair dados do formData do Brick
+      const { token, installments, payment_method_id, payer } = formData;
+      
+      // Preparar dados no formato que o Node-RED espera
+      const paymentData = {
+        transaction_amount: packageData.price,
+        token: token,
+        description: `${packageData.name} - ${packageData.credits} créditos`,
+        installments: installments || 1,
+        payment_method_id: selectedPaymentMethod || payment_method_id,
+        payer: {
+          email: payer?.email || user.email
+        }
+      };
+
+      console.log('📤 Enviando dados para Node-RED:', paymentData);
+
       const response = await fetch('https://api.torrente.com.br/api/mercado-pago/process-payment', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          selectedPaymentMethod,
-          formData,
-          preferenceId,
-          userId: user.uid,
-          packageData,
-        }),
+        body: JSON.stringify(paymentData),
       });
 
       if (!response.ok) {
@@ -216,7 +235,6 @@ const CheckoutPagamento = () => {
       
       if (result.status === 'approved') {
         setPaymentStatus('success');
-        // Adicionar créditos imediatamente para melhor UX
         await addCreditsToUser(packageData.credits);
         
         setTimeout(() => {
