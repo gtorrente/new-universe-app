@@ -193,26 +193,28 @@ const PremiumBenefitsCarousel = ({ onSubscribeClick }) => {
       </div>
 
       {/* Carrossel scrollável - otimizado para experiência nativa */}
-      <div className="w-full">
+      <div className="w-full overflow-hidden">
         <div
           ref={scrollContainerRef}
-          className="flex gap-4 overflow-x-auto scrollbar-hide py-4 pl-4 pr-4"
+          className="flex gap-4 overflow-x-auto scrollbar-hide py-4"
           style={{ 
             scrollSnapType: 'x mandatory',
             WebkitOverflowScrolling: 'touch',
             scrollbarWidth: 'none', // Firefox
             msOverflowStyle: 'none', // IE/Edge
             overscrollBehaviorX: 'contain', // Evita bounce lateral excessivo
-            scrollPaddingLeft: '16px', // Padding para snap correto
-            scrollBehavior: 'auto' // Comportamento nativo
+            scrollPaddingLeft: '16px', // Força primeiro card a respeitar margem
+            scrollBehavior: 'auto', // Comportamento nativo
+            paddingLeft: '16px', // Margem inicial igual aos elementos acima
+            paddingRight: '16px' // Margem final
           }}
         >
-          {premiumBenefitsData.map((benefit, index) => (
+          {premiumBenefitsData.map((benefit) => (
             <div
               key={benefit.id}
               className="flex-shrink-0"
               style={{ 
-                scrollSnapAlign: index === 0 ? 'start' : 'center', // Primeiro card alinha à esquerda
+                scrollSnapAlign: 'start', // Todos os cards alinham ao início (respeitando padding)
                 scrollSnapStop: 'always' // Força parada em cada card
               }}
             >
@@ -223,11 +225,7 @@ const PremiumBenefitsCarousel = ({ onSubscribeClick }) => {
             </div>
           ))}
           
-          {/* Espaçamento final para última card não ficar grudada */}
-          <div 
-            className="flex-shrink-0 w-4" 
-            style={{ scrollSnapAlign: 'end' }}
-          ></div>
+          {/* Espaçamento final removido - não precisamos mais pois temos paddingRight */}
         </div>
       </div>
 
