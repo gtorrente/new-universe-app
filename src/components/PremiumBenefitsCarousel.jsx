@@ -1,126 +1,129 @@
-import { useState, useRef, useEffect } from 'react';
-import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import { useRef, useEffect } from 'react';
+import receitasCatiaImage from '../assets/receitas-catia-premium.jpg';
+import thermaMixImage from '../assets/therma-mix-premium.jpeg';
+import mapaAstralImage from '../assets/mapa-astral-premium2.png';
+import creditosImage from '../assets/creditos-premium.png';
 
-// Dados estruturados dos benefícios premium com design aprimorado
+// Dados estruturados dos benefícios premium com imagens reais
 const premiumBenefitsData = [
   {
     id: 1,
-    image: "🌟",
-    title: "Mapa Astral Completo",
-    description: "Análise detalhada da sua personalidade e futuro",
-    emotionalPhrase: "Descubra quem você realmente é",
-    buttonText: "Quero descobrir",
-    gradient: "from-purple-500 to-purple-700",
-    bgGradient: "from-purple-50 to-purple-100",
-    imageGradient: "from-purple-200 to-purple-300"
+    image: receitasCatiaImage,
+    title: "Receitas em Vídeo",
+    description: "Aprenda com a Catia receitas fáceis e deliciosas para o dia a dia",
+    buttonText: "Quero aprender",
+    gradient: "from-red-500 to-pink-500",
+    bgGradient: "from-red-50 to-pink-50",
+    exclusiveTag: "ACESSO VIP"
   },
   {
     id: 2,
-    image: "💎",
-    title: "30 Créditos Mensais",
-    description: "Use como quiser no tarot, nas previsões e nas conversas com a IA",
-    emotionalPhrase: "Liberdade total para explorar",
-    buttonText: "Quero isso",
-    gradient: "from-yellow-500 to-orange-500",
-    bgGradient: "from-yellow-50 to-orange-100",
-    imageGradient: "from-yellow-200 to-orange-300"
+    image: thermaMixImage,
+    title: "Descontos & Presentes",
+    description: "Assinantes ganham surpresas, cupons e mimos com carinho",
+    buttonText: "Quero meu presente",
+    gradient: "from-green-500 to-emerald-500",
+    bgGradient: "from-green-50 to-emerald-50",
+    exclusiveTag: "SOMENTE ASSINANTES"
   },
   {
     id: 3,
-    image: "🎬",
-    title: "Receitas em Vídeo",
-    description: "Cátia te ensinando receitas deliciosas e práticas",
-    emotionalPhrase: "Aprenda com quem entende",
-    buttonText: "Ver receitas",
-    gradient: "from-red-500 to-pink-500",
-    bgGradient: "from-red-50 to-pink-100",
-    imageGradient: "from-red-200 to-pink-300"
+    image: mapaAstralImage,
+    title: "Mapa Astral Completo",
+    description: "Análise profunda da sua personalidade e propósito de vida",
+    buttonText: "Quero acessar",
+    gradient: "from-purple-500 to-purple-700",
+    bgGradient: "from-purple-50 to-purple-100",
+    exclusiveTag: "ACESSO VIP"
   },
   {
     id: 4,
-    image: "🎁",
-    title: "Descontos & Presentes",
-    description: "Ganhe mimos cósmicos e cupons exclusivos como assinante",
-    emotionalPhrase: "Surpresas especiais só para você",
-    buttonText: "Quero mimos",
-    gradient: "from-green-500 to-emerald-500",
-    bgGradient: "from-green-50 to-emerald-100",
-    imageGradient: "from-green-200 to-emerald-300"
-  },
-  {
-    id: 5,
-    image: "✨",
-    title: "Ser Premium",
-    description: "Desbloqueie o Universo completo — sem limites, só magia",
-    emotionalPhrase: "Transforme sua jornada cósmica",
-    buttonText: "Assinar agora",
-    gradient: "from-indigo-600 to-purple-600",
-    bgGradient: "from-indigo-50 to-purple-100",
-    imageGradient: "from-indigo-200 to-purple-300",
-    isSpecial: true
+    image: creditosImage,
+    title: "30 Créditos Mensais",
+    description: "Use no tarot, previsões e conselhos da CatIA sem limitações",
+    buttonText: "Quero obter",
+    gradient: "from-yellow-500 to-orange-500",
+    bgGradient: "from-yellow-50 to-orange-100",
+    exclusiveTag: "BENEFÍCIO PREMIUM"
   }
+  // {
+  //   id: 5,
+  //   image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=240&fit=crop&auto=format",
+  //   title: "Universo Premium",
+  //   description: "Acesso completo a tudo — sem limites, só magia e crescimento",
+  //   buttonText: "Assinar agora",
+  //   gradient: "from-indigo-600 to-purple-600",
+  //   bgGradient: "from-indigo-50 to-purple-100",
+  //   // isSpecial: true,
+  //   exclusiveTag: "MAIS POPULAR"
+  // }
 ];
 
-const PremiumBenefitCard = ({ benefit, onClick, isVisible }) => {
+const PremiumBenefitCard = ({ benefit, onClick }) => {
   return (
     <div
       className={`
-        flex-shrink-0 w-72 h-80 rounded-3xl overflow-hidden
-        bg-gradient-to-br ${benefit.bgGradient}
-        border border-white/50 shadow-xl hover:shadow-2xl
-        transition-all duration-300 cursor-pointer transform
-        ${isVisible ? 'hover:scale-105' : ''}
-        ${benefit.isSpecial ? 'ring-2 ring-purple-300 ring-opacity-50' : ''}
+        flex-shrink-0 w-72 h-96 bg-white rounded-3xl overflow-hidden
+        shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer
+        transform hover:scale-[1.02] ${benefit.isSpecial ? 'ring-2 ring-purple-300' : ''}
+        flex flex-col relative
       `}
       onClick={onClick}
     >
-      {/* Header com imagem de fundo */}
-      <div className={`
-        relative h-40 bg-gradient-to-br ${benefit.imageGradient}
-        flex items-center justify-center overflow-hidden
-      `}>
-        {/* Padrão de fundo decorativo */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-4 left-4 w-16 h-16 rounded-full bg-white/20"></div>
-          <div className="absolute bottom-6 right-6 w-12 h-12 rounded-full bg-white/15"></div>
-          <div className="absolute top-12 right-8 w-8 h-8 rounded-full bg-white/10"></div>
+      {/* Tag de exclusividade */}
+      <div className="absolute top-4 left-4 z-10">
+        <div className={`
+          px-3 py-1 rounded-full text-xs font-bold text-white shadow-lg
+          ${benefit.isSpecial 
+            ? 'bg-gradient-to-r from-purple-600 to-pink-600' 
+            : 'bg-gradient-to-r from-gray-800 to-gray-900'
+          }
+        `}>
+          {benefit.exclusiveTag}
         </div>
+      </div>
+
+      {/* Imagem no topo */}
+      <div className="relative h-48 overflow-hidden flex-shrink-0">
+        <img
+          src={benefit.image}
+          alt={benefit.title}
+          className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+          loading="lazy"
+        />
         
-        {/* Emoji principal */}
-        <div className="text-6xl z-10 transform hover:scale-110 transition-transform">
-          {benefit.image}
-        </div>
+        {/* Overlay sutil para melhor legibilidade */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
         
-        {/* Badge especial para o card premium */}
+        {/* Badge especial para o card premium - movido para baixo da tag */}
         {benefit.isSpecial && (
-          <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full px-3 py-1">
-            <span className="text-xs font-bold text-purple-600">POPULAR</span>
+          <div className="absolute top-4 right-4 bg-purple-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
+            POPULAR
           </div>
         )}
       </div>
 
-      {/* Conteúdo */}
-      <div className="p-6 h-40 flex flex-col justify-between">
-        {/* Título e descrição */}
-        <div className="space-y-2">
-          <h3 className="font-bold text-lg text-gray-800 leading-tight">
+      {/* Conteúdo do card */}
+      <div className="p-6 flex-1 flex flex-col justify-between">
+        <div>
+          {/* Título */}
+          <h3 className="font-bold text-xl text-gray-800 mb-3 leading-tight">
             {benefit.title}
           </h3>
-          <p className="text-sm text-gray-600 leading-relaxed">
+          
+          {/* Descrição */}
+          <p className="text-gray-600 text-sm leading-relaxed mb-6">
             {benefit.description}
-          </p>
-          <p className="text-xs font-medium text-gray-500 italic">
-            {benefit.emotionalPhrase}
           </p>
         </div>
 
         {/* Botão de ação */}
         <button
           className={`
-            w-full py-3 rounded-2xl font-bold text-sm text-white
-            bg-gradient-to-r ${benefit.gradient}
-            hover:shadow-lg hover:scale-[1.02]
-            active:scale-[0.98] transition-all duration-200
+            w-full py-3 px-4 rounded-2xl font-bold text-sm text-white
+            bg-gradient-to-r from-purple-500 to-purple-700
+            hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]
+            transition-all duration-200
             ${benefit.isSpecial ? 'shadow-lg shadow-purple-500/25' : ''}
           `}
           onClick={(e) => {
@@ -136,81 +139,85 @@ const PremiumBenefitCard = ({ benefit, onClick, isVisible }) => {
 };
 
 const PremiumBenefitsCarousel = ({ onSubscribeClick }) => {
-  const [showLeftArrow, setShowLeftArrow] = useState(false);
-  const [showRightArrow, setShowRightArrow] = useState(true);
-  const [visibleCards, setVisibleCards] = useState(new Set([0, 1, 2]));
   const scrollContainerRef = useRef(null);
 
-  // Atualizar visibilidade das setas e cards visíveis
-  const updateVisibility = () => {
-    if (!scrollContainerRef.current) return;
-    
-    const container = scrollContainerRef.current;
-    const scrollLeft = container.scrollLeft;
-    const maxScroll = container.scrollWidth - container.clientWidth;
-    
-    setShowLeftArrow(scrollLeft > 20);
-    setShowRightArrow(scrollLeft < maxScroll - 20);
-
-    // Calcular quais cards estão visíveis
-    const cardWidth = 288; // w-72 = 288px
-    const containerWidth = container.clientWidth;
-    const firstVisibleIndex = Math.floor(scrollLeft / cardWidth);
-    const visibleCount = Math.ceil(containerWidth / cardWidth) + 1;
-    
-    const visible = new Set();
-    for (let i = firstVisibleIndex; i < firstVisibleIndex + visibleCount && i < premiumBenefitsData.length; i++) {
-      visible.add(i);
-    }
-    setVisibleCards(visible);
-  };
-
-  // Scroll suave para a esquerda
-  const scrollLeft = () => {
-    if (!scrollContainerRef.current) return;
-    const container = scrollContainerRef.current;
-    const cardWidth = 288 + 16; // largura do card + gap
-    container.scrollBy({ left: -cardWidth, behavior: 'smooth' });
-  };
-
-  // Scroll suave para a direita
-  const scrollRight = () => {
-    if (!scrollContainerRef.current) return;
-    const container = scrollContainerRef.current;
-    const cardWidth = 288 + 16;
-    container.scrollBy({ left: cardWidth, behavior: 'smooth' });
-  };
-
   // Handle card click
-  const handleCardClick = (benefit) => {
-    if (benefit.isSpecial && onSubscribeClick) {
-      onSubscribeClick();
-    } else if (onSubscribeClick) {
-      // Para outros cards, também pode abrir o modal premium
+  const handleCardClick = () => {
+    if (onSubscribeClick) {
       onSubscribeClick();
     }
   };
 
+  // Configurar scroll suave e fluido
   useEffect(() => {
     const container = scrollContainerRef.current;
-    if (container) {
-      const handleScroll = () => {
-        requestAnimationFrame(updateVisibility);
-      };
+    if (!container) return;
+
+    // Melhorar scroll horizontal com wheel do mouse
+    const handleWheel = (e) => {
+      // Apenas aplicar se for scroll vertical (deltaY)
+      if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+        e.preventDefault();
+        
+        // Scroll mais suave e responsivo
+        const scrollAmount = e.deltaY * 0.8; // Fator de suavidade
+        const maxScrollLeft = container.scrollWidth - container.clientWidth;
+        const newScrollLeft = Math.max(0, Math.min(maxScrollLeft, container.scrollLeft + scrollAmount));
+        
+        // Usar requestAnimationFrame para scroll mais fluido
+        requestAnimationFrame(() => {
+          container.scrollLeft = newScrollLeft;
+        });
+      }
+    };
+
+    // Adicionar suporte para touch mais fluido
+    let isScrolling = false;
+    let startX = 0;
+    let scrollLeft = 0;
+
+    const handleTouchStart = (e) => {
+      isScrolling = true;
+      startX = e.touches[0].pageX - container.offsetLeft;
+      scrollLeft = container.scrollLeft;
+      container.style.scrollBehavior = 'auto'; // Desabilitar scroll-behavior durante touch
+    };
+
+    const handleTouchMove = (e) => {
+      if (!isScrolling) return;
+      e.preventDefault();
       
-      container.addEventListener('scroll', handleScroll, { passive: true });
-      updateVisibility(); // Initial check
+      const x = e.touches[0].pageX - container.offsetLeft;
+      const walk = (x - startX) * 1.5; // Fator de velocidade do scroll
       
-      return () => {
-        container.removeEventListener('scroll', handleScroll);
-      };
-    }
+      requestAnimationFrame(() => {
+        container.scrollLeft = scrollLeft - walk;
+      });
+    };
+
+    const handleTouchEnd = () => {
+      isScrolling = false;
+      container.style.scrollBehavior = 'smooth'; // Reabilitar scroll suave
+    };
+
+    // Event listeners
+    container.addEventListener('wheel', handleWheel, { passive: false });
+    container.addEventListener('touchstart', handleTouchStart, { passive: true });
+    container.addEventListener('touchmove', handleTouchMove, { passive: false });
+    container.addEventListener('touchend', handleTouchEnd, { passive: true });
+    
+    return () => {
+      container.removeEventListener('wheel', handleWheel);
+      container.removeEventListener('touchstart', handleTouchStart);
+      container.removeEventListener('touchmove', handleTouchMove);
+      container.removeEventListener('touchend', handleTouchEnd);
+    };
   }, []);
 
   return (
-    <div className="relative">
+    <div className="relative overflow-hidden">
       {/* Header da seção */}
-      <div className="px-6 mb-6">
+      <div className="px-4 mb-6">
         <h2 className="text-2xl font-bold text-gray-800 mb-2">
           ✨ Benefícios Premium
         </h2>
@@ -219,70 +226,32 @@ const PremiumBenefitsCarousel = ({ onSubscribeClick }) => {
         </p>
       </div>
 
-      {/* Container do carrossel */}
+      {/* Carrossel scrollável - otimizado */}
       <div className="relative">
-        {/* Seta esquerda */}
-        {showLeftArrow && (
-          <button
-            onClick={scrollLeft}
-            className="absolute left-4 top-1/2 -translate-y-1/2 z-20
-                     w-12 h-12 bg-white rounded-full shadow-lg border border-gray-100
-                     flex items-center justify-center hover:bg-gray-50 
-                     hover:scale-110 transition-all duration-200"
-          >
-            <FaChevronLeft className="text-gray-600" />
-          </button>
-        )}
-
-        {/* Seta direita */}
-        {showRightArrow && (
-          <button
-            onClick={scrollRight}
-            className="absolute right-4 top-1/2 -translate-y-1/2 z-20
-                     w-12 h-12 bg-white rounded-full shadow-lg border border-gray-100
-                     flex items-center justify-center hover:bg-gray-50
-                     hover:scale-110 transition-all duration-200"
-          >
-            <FaChevronRight className="text-gray-600" />
-          </button>
-        )}
-
-        {/* Carrossel scrollável */}
         <div
           ref={scrollContainerRef}
-          className="flex gap-4 overflow-x-auto scrollbar-hide px-6 py-4"
+          className="flex gap-4 overflow-x-auto scrollbar-hide py-4 px-4"
           style={{ 
             scrollSnapType: 'x mandatory',
             WebkitOverflowScrolling: 'touch'
           }}
         >
-          {premiumBenefitsData.map((benefit, index) => (
+          {premiumBenefitsData.map((benefit) => (
             <div
               key={benefit.id}
+              className="flex-shrink-0"
               style={{ scrollSnapAlign: 'start' }}
             >
               <PremiumBenefitCard
                 benefit={benefit}
-                onClick={() => handleCardClick(benefit)}
-                isVisible={visibleCards.has(index)}
+                onClick={handleCardClick}
               />
             </div>
           ))}
+          
+          {/* Espaçamento final para evitar cards grudarem na borda direita */}
+          <div className="flex-shrink-0 w-4"></div>
         </div>
-      </div>
-
-      {/* Indicadores de progresso */}
-      <div className="flex justify-center mt-6 gap-2">
-        {premiumBenefitsData.map((_, index) => (
-          <div
-            key={index}
-            className={`h-2 rounded-full transition-all duration-300 ${
-              visibleCards.has(index) 
-                ? 'w-8 bg-purple-400' 
-                : 'w-2 bg-gray-300'
-            }`}
-          />
-        ))}
       </div>
     </div>
   );

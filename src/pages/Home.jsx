@@ -386,7 +386,7 @@ export default function Home() {
               required
               max={new Date().toISOString().split('T')[0]}
             />
-            <button
+            <button 
               className="bg-purple-600 text-white px-6 py-2 rounded font-bold hover:bg-purple-700 w-full"
               onClick={handleSalvarData}
               disabled={!dataNascimento}
