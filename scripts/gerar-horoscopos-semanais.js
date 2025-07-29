@@ -129,7 +129,7 @@ TEMAS SUGERIDOS: Oportunidade, Afeto, Comunicação, Expansão, Reflexão, Desca
 
 CORES SUGERIDAS: #8B5CF6 (roxo), #F59E0B (amarelo), #EC4899 (rosa), #10B981 (verde), #F97316 (laranja), #3B82F6 (azul), #6366F1 (índigo)
 
-ICONES DISPONÍVEIS: FaStar, FaRegHeart, FaRegEdit, BsFillSunFill, BsFillMoonStarsFill, GiPlanetConquest, FaRegSmile, FaRegLightbulb, FaRegGem, FaRegCompass, FaRegEye, FaRegHandPeace, FaRegClock, FaRegCalendarAlt, FaRegUser, FaRegBookmark, FaRegBell, FaRegGift, FaRegTrophy, FaRegFire, FaRegLeaf, FaWater, FaMountain, FaTree, FaCloud, FaRegMoon, FaRegSun
+ICONES DISPONÍVEIS: FaStar, FaRegHeart, FaRegEdit, BsFillSunFill, BsFillMoonStarsFill, GiPlanetConquest
 
 IMPORTANTE: Use ícones diferentes para cada dia da semana. Escolha ícones que combinem com o tema do dia.`;
 

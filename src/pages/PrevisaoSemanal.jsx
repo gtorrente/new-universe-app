@@ -4,7 +4,7 @@ import Header from "../components/Header";
 import { auth, db } from "../firebaseConfigFront";
 import { doc, getDoc } from "firebase/firestore";
 
-import { FaStar, FaRegPlayCircle, FaRegEdit, FaRegHeart, FaRegSmile, FaRegLightbulb, FaRegGem, FaRegCompass, FaRegEye, FaRegHandPeace, FaRegClock, FaRegCalendarAlt, FaRegUser, FaRegBookmark, FaRegBell, FaRegGift, FaRegTrophy, FaRegFire, FaRegLeaf, FaRegMoon, FaRegSun, FaCloud, FaWater, FaMountain, FaTree } from 'react-icons/fa';
+import { FaStar, FaRegPlayCircle, FaRegEdit, FaRegHeart } from 'react-icons/fa';
 import { BsFillSunFill, BsFillMoonStarsFill } from 'react-icons/bs';
 import { GiPlanetConquest } from 'react-icons/gi';
 
@@ -15,28 +15,7 @@ const iconesMap = {
   "FaRegEdit": <FaRegEdit className="text-green-400" />,
   "BsFillSunFill": <BsFillSunFill className="text-orange-400" />,
   "BsFillMoonStarsFill": <BsFillMoonStarsFill className="text-blue-400" />,
-  "GiPlanetConquest": <GiPlanetConquest className="text-purple-400" />,
-  "FaRegSmile": <FaRegSmile className="text-yellow-400" />,
-  "FaRegLightbulb": <FaRegLightbulb className="text-yellow-400" />,
-  "FaRegGem": <FaRegGem className="text-purple-400" />,
-  "FaRegCompass": <FaRegCompass className="text-blue-400" />,
-  "FaRegEye": <FaRegEye className="text-indigo-400" />,
-  "FaRegHandPeace": <FaRegHandPeace className="text-green-400" />,
-  "FaRegClock": <FaRegClock className="text-gray-400" />,
-  "FaRegCalendarAlt": <FaRegCalendarAlt className="text-blue-400" />,
-  "FaRegUser": <FaRegUser className="text-purple-400" />,
-  "FaRegBookmark": <FaRegBookmark className="text-red-400" />,
-  "FaRegBell": <FaRegBell className="text-yellow-400" />,
-  "FaRegGift": <FaRegGift className="text-pink-400" />,
-  "FaRegTrophy": <FaRegTrophy className="text-yellow-400" />,
-  "FaRegFire": <FaRegFire className="text-red-400" />,
-  "FaRegLeaf": <FaRegLeaf className="text-green-400" />,
-  "FaRegWater": <FaWater className="text-blue-400" />,
-  "FaRegMountain": <FaMountain className="text-gray-400" />,
-  "FaRegTree": <FaTree className="text-green-400" />,
-  "FaRegCloud": <FaCloud className="text-gray-400" />,
-  "FaRegMoon": <FaRegMoon className="text-indigo-400" />,
-  "FaRegSun": <FaRegSun className="text-yellow-400" />
+  "GiPlanetConquest": <GiPlanetConquest className="text-purple-400" />
 };
 
 const nomesSignos = {
@@ -285,7 +264,7 @@ export default function PrevisaoSemanal() {
   }, []);
 
   // Função para gerar áudio com ElevenLabs
-  const gerarAudio = async () => {
+  const gerarAudio = async () => { 
     if (!mensagemAudioCatia.trim()) {
       alert("Nenhum texto disponível para converter em áudio.");
       return;
