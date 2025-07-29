@@ -152,7 +152,11 @@ function useHoroscopo(signoEn) {
       const data = await res.json();
       
       if (!data.success) {
-        throw new Error(data.error || "Erro na API");
+        // Melhorar tratamento de erro para mostrar mais detalhes
+        const errorMessage = data.error ? 
+          (typeof data.error === 'object' ? data.error.message || JSON.stringify(data.error) : data.error) : 
+          "Erro na API";
+        throw new Error(errorMessage);
       }
       
       const horoscopoTexto = data.data?.horoscopo?.mensagem || "Horóscopo indisponível.";
