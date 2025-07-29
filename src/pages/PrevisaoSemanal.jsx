@@ -4,7 +4,7 @@ import Header from "../components/Header";
 import { auth, db } from "../firebaseConfigFront";
 import { doc, getDoc } from "firebase/firestore";
 
-import { FaStar, FaRegPlayCircle, FaRegEdit, FaRegHeart, FaRegSmile, FaRegLightbulb, FaRegGem, FaRegCompass, FaRegEye, FaRegHandPeace, FaRegClock, FaRegCalendarAlt, FaRegUser, FaRegBookmark, FaRegBell, FaRegGift, FaRegTrophy, FaRegFire, FaRegLeaf, FaRegWater, FaRegMountain, FaRegTree, FaRegCloud, FaRegMoon, FaRegSun } from 'react-icons/fa';
+import { FaStar, FaRegPlayCircle, FaRegEdit, FaRegHeart, FaRegSmile, FaRegLightbulb, FaRegGem, FaRegCompass, FaRegEye, FaRegHandPeace, FaRegClock, FaRegCalendarAlt, FaRegUser, FaRegBookmark, FaRegBell, FaRegGift, FaRegTrophy, FaRegFire, FaRegLeaf, FaRegMoon, FaRegSun, FaCloud, FaWater, FaMountain, FaTree } from 'react-icons/fa';
 import { BsFillSunFill, BsFillMoonStarsFill } from 'react-icons/bs';
 import { GiPlanetConquest } from 'react-icons/gi';
 
@@ -31,10 +31,10 @@ const iconesMap = {
   "FaRegTrophy": <FaRegTrophy className="text-yellow-400" />,
   "FaRegFire": <FaRegFire className="text-red-400" />,
   "FaRegLeaf": <FaRegLeaf className="text-green-400" />,
-  "FaRegWater": <FaRegWater className="text-blue-400" />,
-  "FaRegMountain": <FaRegMountain className="text-gray-400" />,
-  "FaRegTree": <FaRegTree className="text-green-400" />,
-  "FaRegCloud": <FaRegCloud className="text-gray-400" />,
+  "FaRegWater": <FaWater className="text-blue-400" />,
+  "FaRegMountain": <FaMountain className="text-gray-400" />,
+  "FaRegTree": <FaTree className="text-green-400" />,
+  "FaRegCloud": <FaCloud className="text-gray-400" />,
   "FaRegMoon": <FaRegMoon className="text-indigo-400" />,
   "FaRegSun": <FaRegSun className="text-yellow-400" />
 };

@@ -147,7 +147,7 @@ const BlocoFormatado = ({ bloco }) => {
                   </span>
                 </div>
               </div>
-            );
+            ); 
           }
           
           // Se a linha parece ser um item de lista (começa com número ou traço)
