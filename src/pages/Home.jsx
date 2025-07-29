@@ -154,9 +154,22 @@ function useHoroscopo(signoEn) {
       
       if (!data.success) {
         // Melhorar tratamento de erro para mostrar mais detalhes
-        const errorMessage = data.error ? 
-          (typeof data.error === 'object' ? data.error.message || JSON.stringify(data.error) : data.error) : 
-          "Erro na API";
+        let errorMessage = "Erro na API";
+        
+        if (data.error) {
+          if (typeof data.error === 'object') {
+            // Erro do Firebase (status NOT_FOUND)
+            if (data.error.status === 'NOT_FOUND') {
+              errorMessage = "Horóscopo ainda não foi gerado para hoje. Tente novamente em alguns minutos.";
+              console.warn('🔄 Horóscopo não encontrado para hoje, pode estar sendo gerado...');
+            } else {
+              errorMessage = data.error.message || JSON.stringify(data.error);
+            }
+          } else {
+            errorMessage = data.error;
+          }
+        }
+        
         throw new Error(errorMessage);
       }
       
@@ -295,21 +308,40 @@ export default function Home() {
           const signSalvo = userData.sign; // Campo signo salvo no Firebase
           
           if (dataNasc) {
+            console.log('📅 Data de nascimento encontrada:', dataNasc);
+            
             // Se já tem signo salvo, usa ele
             if (signSalvo) {
+              console.log('✅ Signo salvo no Firebase:', signSalvo);
               setSignoEn(signSalvo);
+              
               // Converte de inglês para português para exibição
               const signObj = getSignMapping().find(s => s.en === signSalvo);
-              setSigno(signObj ? signObj.sign : "");
+              console.log('🔄 Conversão EN->PT:', { signSalvo, signObj });
+              
+              const signoPortugues = signObj ? signObj.sign : "";
+              setSigno(signoPortugues);
+              
+              console.log('🎯 Signo definido:', { signoEn: signSalvo, signo: signoPortugues });
             } else {
+              console.log('❓ Signo não salvo, calculando...');
+              
               // Se não tem signo salvo, calcula e salva
               const [, mes, dia] = dataNasc.split('-').map(Number);
+              console.log('📊 Dados para calcular signo:', { dia, mes });
+              
               const signObj = getSign(dia, mes);
+              console.log('🎯 Signo calculado:', signObj);
+              
               setSigno(signObj.sign);
               setSignoEn(signObj.en);
               
+              console.log('💾 Salvando signo no Firebase:', signObj.en);
+              
               // Salva o signo no Firebase
               await updateDoc(userRef, { sign: signObj.en });
+              
+              console.log('✅ Estados atualizados:', { signo: signObj.sign, signoEn: signObj.en });
             }
           }
           if (!dataNasc) setShowModal(true);
@@ -332,13 +364,20 @@ export default function Home() {
     return () => unsubscribe();
   }, []);
 
+  // Função para salvar data de nascimento e calcular signo
   async function handleSalvarData() {
     if (!dataNascimento || !userDocId) return;
+    
+    console.log('💾 Salvando data de nascimento:', dataNascimento);
+    
     const userRef = doc(db, "usuarios", userDocId);
     
     // Calcular o signo baseado na data de nascimento
     const [, mes, dia] = dataNascimento.split('-').map(Number);
+    console.log('📅 Data parseada:', { dia, mes });
+    
     const signObj = getSign(dia, mes);
+    console.log('🎯 Signo calculado:', signObj);
     
     // Verificar se usuário tem créditos, se não tiver, dar 5 iniciais
     const userSnap = await getDoc(userRef);
@@ -358,9 +397,11 @@ export default function Home() {
       setCreditos(5);
     }
     
+    console.log('💾 Dados a salvar no Firebase:', dadosParaSalvar);
     await updateDoc(userRef, dadosParaSalvar);
     
     // Atualizar o estado local
+    console.log('🔄 Atualizando estado local:', { signo: signObj.sign, signoEn: signObj.en });
     setSigno(signObj.sign);
     setSignoEn(signObj.en);
     setShowModal(false);

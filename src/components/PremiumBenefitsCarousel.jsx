@@ -153,14 +153,14 @@ const PremiumBenefitsCarousel = ({ onSubscribeClick }) => {
     const container = scrollContainerRef.current;
     if (!container) return;
 
-    // Melhorar scroll horizontal com wheel do mouse
+    // Melhorar scroll horizontal apenas com wheel do mouse (desktop)
     const handleWheel = (e) => {
-      // Apenas aplicar se for scroll vertical (deltaY)
-      if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+      // Apenas aplicar se for scroll vertical (deltaY) e não for touch device
+      if (Math.abs(e.deltaY) > Math.abs(e.deltaX) && !('ontouchstart' in window)) {
         e.preventDefault();
         
         // Scroll mais suave e responsivo
-        const scrollAmount = e.deltaY * 0.8; // Fator de suavidade
+        const scrollAmount = e.deltaY * 0.6; // Reduzido para mais suavidade
         const maxScrollLeft = container.scrollWidth - container.clientWidth;
         const newScrollLeft = Math.max(0, Math.min(maxScrollLeft, container.scrollLeft + scrollAmount));
         
@@ -171,46 +171,15 @@ const PremiumBenefitsCarousel = ({ onSubscribeClick }) => {
       }
     };
 
-    // Adicionar suporte para touch mais fluido
-    let isScrolling = false;
-    let startX = 0;
-    let scrollLeft = 0;
-
-    const handleTouchStart = (e) => {
-      isScrolling = true;
-      startX = e.touches[0].pageX - container.offsetLeft;
-      scrollLeft = container.scrollLeft;
-      container.style.scrollBehavior = 'auto'; // Desabilitar scroll-behavior durante touch
-    };
-
-    const handleTouchMove = (e) => {
-      if (!isScrolling) return;
-      e.preventDefault();
-      
-      const x = e.touches[0].pageX - container.offsetLeft;
-      const walk = (x - startX) * 1.5; // Fator de velocidade do scroll
-      
-      requestAnimationFrame(() => {
-        container.scrollLeft = scrollLeft - walk;
-      });
-    };
-
-    const handleTouchEnd = () => {
-      isScrolling = false;
-      container.style.scrollBehavior = 'smooth'; // Reabilitar scroll suave
-    };
-
-    // Event listeners
-    container.addEventListener('wheel', handleWheel, { passive: false });
-    container.addEventListener('touchstart', handleTouchStart, { passive: true });
-    container.addEventListener('touchmove', handleTouchMove, { passive: false });
-    container.addEventListener('touchend', handleTouchEnd, { passive: true });
+    // Apenas adicionar wheel listener para desktop
+    if (!('ontouchstart' in window)) {
+      container.addEventListener('wheel', handleWheel, { passive: false });
+    }
     
     return () => {
-      container.removeEventListener('wheel', handleWheel);
-      container.removeEventListener('touchstart', handleTouchStart);
-      container.removeEventListener('touchmove', handleTouchMove);
-      container.removeEventListener('touchend', handleTouchEnd);
+      if (!('ontouchstart' in window)) {
+        container.removeEventListener('wheel', handleWheel);
+      }
     };
   }, []);
 
@@ -226,14 +195,15 @@ const PremiumBenefitsCarousel = ({ onSubscribeClick }) => {
         </p>
       </div>
 
-      {/* Carrossel scrollável - otimizado */}
-      <div className="relative">
+      {/* Carrossel scrollável - otimizado para mobile */}
+      <div className="relative -mx-4">
         <div
           ref={scrollContainerRef}
           className="flex gap-4 overflow-x-auto scrollbar-hide py-4 px-4"
           style={{ 
             scrollSnapType: 'x mandatory',
-            WebkitOverflowScrolling: 'touch'
+            WebkitOverflowScrolling: 'touch',
+            scrollBehavior: 'smooth'
           }}
         >
           {premiumBenefitsData.map((benefit) => (
@@ -250,7 +220,7 @@ const PremiumBenefitsCarousel = ({ onSubscribeClick }) => {
           ))}
           
           {/* Espaçamento final para evitar cards grudarem na borda direita */}
-          <div className="flex-shrink-0 w-4"></div>
+          <div className="flex-shrink-0 w-0"></div>
         </div>
       </div>
     </div>
