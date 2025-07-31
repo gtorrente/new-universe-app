@@ -1,11 +1,10 @@
 // Página de Chat com a CatIA do app Universo Catia
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { AiOutlineSend } from "react-icons/ai";
 import Header from "../components/Header";
 import { auth, db } from "../firebaseConfigFront";
-import { doc, getDoc } from "firebase/firestore";
-import { motion } from "framer-motion";
+import { doc, getDoc, collection, addDoc, serverTimestamp } from "firebase/firestore";
 
 // Sugestões de perguntas para facilitar a interação
 const sugestoes = [
@@ -201,6 +200,7 @@ export default function CatiaChat() {
   const [user, setUser] = useState(null);
   const [creditos, setCreditos] = useState(0);
   const [isTyping, setIsTyping] = useState(false);
+  const [conversaIniciada, setConversaIniciada] = useState(false);
 
   // Recupera usuário e créditos do Firestore
   useEffect(() => {
@@ -224,6 +224,90 @@ export default function CatiaChat() {
     }
   }, [mensagens, isTyping]);
 
+  // Função para salvar conversa no Firebase
+  const salvarConversaNoFirebase = useCallback(async () => {
+    console.log('🔍 Tentando salvar conversa...');
+    console.log('User:', user?.uid);
+    console.log('Conversa iniciada:', conversaIniciada);
+    console.log('Total mensagens:', mensagens.length);
+    
+    if (!user || !conversaIniciada || mensagens.length <= 1) {
+      console.log('❌ Condições não atendidas para salvar');
+      return;
+    }
+    
+    try {
+      // Filtrar apenas mensagens reais (remover mensagem inicial da CatIA)
+      const mensagensReais = mensagens.slice(1);
+      
+      console.log('📝 Mensagens reais:', mensagensReais.length);
+      
+      if (mensagensReais.length === 0) {
+        console.log('❌ Nenhuma mensagem real para salvar');
+        return;
+      }
+
+      // Criar título baseado na primeira pergunta do usuário
+      const primeiraPergunta = mensagensReais.find(msg => msg.autor === 'usuario')?.texto || 'Conversa com CatIA';
+      const titulo = primeiraPergunta.length > 50 
+        ? primeiraPergunta.substring(0, 47) + '...' 
+        : primeiraPergunta;
+
+      console.log('📋 Título:', titulo);
+
+      // Dados a serem salvos
+      const dadosConversa = {
+        userId: user.uid,
+        titulo: titulo,
+        mensagens: mensagensReais.map(msg => ({
+          ...msg,
+          timestamp: new Date()
+        })),
+        dataInicio: new Date(Date.now() - (mensagensReais.length * 30000)), // Estimativa
+        dataFim: serverTimestamp(),
+        totalMensagens: mensagensReais.length
+      };
+
+      console.log('💾 Salvando no Firebase:', dadosConversa);
+
+      // Salvar no Firestore
+      const docRef = await addDoc(collection(db, 'conversas_catia'), dadosConversa);
+      
+      console.log('✅ Conversa salva com sucesso! ID:', docRef.id);
+    } catch (error) {
+      console.error('❌ Erro ao salvar conversa:', error);
+    }
+  }, [user, conversaIniciada, mensagens]);
+
+  // Salvar conversa quando sair da página
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      if (conversaIniciada && mensagens.length > 1) {
+        salvarConversaNoFirebase();
+      }
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.hidden && conversaIniciada && mensagens.length > 1) {
+        salvarConversaNoFirebase();
+      }
+    };
+
+    // Event listeners para salvar quando sair
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      
+      // Salvar também quando componente desmonta
+      if (conversaIniciada && mensagens.length > 1) {
+        salvarConversaNoFirebase();
+      }
+    };
+  }, [mensagens, user, conversaIniciada, salvarConversaNoFirebase]);
+
   // Envia mensagem do usuário e recebe resposta da CatIA
   async function enviarMensagem(e, textoSugestao) {
     if (e) e.preventDefault();
@@ -239,6 +323,11 @@ export default function CatiaChat() {
     setMensagens(msgs => [...msgs, { autor: "usuario", texto }]);
     setInput("");
     setIsTyping(true); // Inicia indicador de digitação
+    
+    // Marcar que a conversa foi iniciada
+    if (!conversaIniciada) {
+      setConversaIniciada(true);
+    }
 
     // Log para depuração
     console.log("Enviando para N8N:", {
@@ -247,11 +336,18 @@ export default function CatiaChat() {
     });
 
     try {
-      // Pegar últimas 8 mensagens para melhor contexto (4 pares pergunta/resposta)
-      const historico = mensagens.slice(-8).map(msg => ({
+      // Pegar TODAS as mensagens da conversa atual (sem a inicial da CatIA)
+      const mensagensReais = mensagens.slice(1); // Remove mensagem inicial
+      const mensagensParaHistorico = [...mensagensReais, { autor: "usuario", texto }];
+      
+      const historico = mensagensParaHistorico.map((msg, index) => ({
         autor: msg.autor === 'usuario' ? 'Usuário' : 'CatIA',
-        texto: msg.texto.substring(0, 200) // Limitar tamanho para não estourar tokens
+        texto: msg.texto,
+        ordem: index + 1
       }));
+
+      console.log('📚 Histórico COMPLETO enviado:', historico);
+      console.log('📊 Total de mensagens no histórico:', historico.length);
 
       const response = await fetch(N8N_WEBHOOK_URL, {
         method: "POST",
@@ -259,7 +355,14 @@ export default function CatiaChat() {
         body: JSON.stringify({
           pergunta: texto,
           userId: user?.uid || "anonimo",
-          historico: historico
+          historico: historico,
+          isNewConversation: mensagens.length === 1,
+          totalMensagensNaConversa: mensagens.length,
+          debug: {
+            mensagensOriginais: mensagens.length,
+            mensagensReais: mensagensReais.length,
+            historicoEnviado: historico.length
+          }
         })
       });
 
@@ -325,6 +428,7 @@ export default function CatiaChat() {
       <Header user={user} creditos={creditos} />
       <div className="flex flex-col items-center w-full">
         <div className="flex flex-col w-full flex-1 h-full relative">
+          {/* Sugestões de perguntas (apenas quando conversa nova) */}
           {mensagens.length === 1 && (
             <div className="flex flex-wrap gap-2 px-4 pt-2 pb-1 justify-center sticky top-0 z-10 bg-gradient-to-br from-purple-100 to-blue-100/80">
               {sugestoes.map((s, i) => (
@@ -347,17 +451,14 @@ export default function CatiaChat() {
           >
             {mensagens.map((msg, idx) => (
               msg.autor === "catia" ? (
-                <motion.div
+                <div
                   key={idx}
-                  initial={{ opacity: 0, x: -30 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.5 }}
                   className="max-w-[90%] rounded-2xl px-6 py-5 shadow-lg font-sans bg-white border border-purple-100 self-start"
                 >
                   {formatarResposta(msg.texto).map((bloco, blocoIdx) => (
                     <BlocoFormatado key={blocoIdx} bloco={bloco} />
                   ))}
-                </motion.div>
+                </div>
               ) : (
                 <div
                   key={idx}
@@ -392,6 +493,18 @@ export default function CatiaChat() {
               autoFocus
               disabled={isTyping}
             />
+            {/* Botão temporário para testar salvamento */}
+            {conversaIniciada && mensagens.length > 1 && (
+              <button
+                type="button"
+                onClick={salvarConversaNoFirebase}
+                className="bg-green-500 hover:bg-green-600 text-white rounded-full p-3 shadow transition mr-2"
+                title="Salvar conversa (teste)"
+              >
+                💾
+              </button>
+            )}
+            
             <button
               type="submit"
               className={`bg-purple-600 hover:bg-purple-700 text-white rounded-full p-3 shadow transition ${isTyping || !input.trim() ? 'opacity-50 cursor-not-allowed bg-purple-300 hover:bg-purple-300' : ''}`}

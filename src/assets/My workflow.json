@@ -1,0 +1,149 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "chat-catia",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -336,
+        -80
+      ],
+      "id": "8dc3f847-7934-4c37-9c1c-13875f971796",
+      "name": "Webhook",
+      "webhookId": "85716c26-aa27-420c-98a4-aa3ea08d579c"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.body.pergunta }}",
+        "options": {
+          "systemMessage": "Você é a CatIA, assistente virtual carinhosa da Catia Fonseca.\n\nCONVERSA ANTERIOR:\n{{#if $json.historico}}\n{{#each $json.historico}}\n{{this.autor}}: {{this.texto}}\n{{/each}}\n{{else}}\n[Primeira mensagem da conversa]\n{{/if}}\n\nPERSONALIDADE:\n- Fale como uma amiga próxima, carinhosa e acolhedora\n- Use expressões brasileiras naturais\n- Seja positiva e encorajadora  \n- Trate o usuário com carinho (\"querido\", \"amor\", \"meu bem\")\n- Lembre-se do que foi conversado antes\n\nESPECIALIDADES:\n- Conselhos de vida e bem-estar\n- Receitas culinárias (simples e práticas)\n- Astrologia e espiritualidade\n- Motivação e autoajuda\n\nFORMATO DE RECEITAS:\n**Receita: [Nome]**\n**Ingredientes:**\n- Lista dos ingredientes\n**Modo de Preparo:**  \n1. Passo a passo numerado\n**Tempo de preparo:** X minutos\n\nPERGUNTA ATUAL: {{ $json.pergunta }}\n\nResponda considerando toda a conversa anterior e seja sempre afetuosa! ✨"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.1,
+      "position": [
+        -64,
+        -80
+      ],
+      "id": "da061835-b092-4fc2-b039-b7a5240744a0",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -112,
+        160
+      ],
+      "id": "17e284cc-b4fe-4a13-86e2-162b51de188e",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "1Tzbz2SA2xDb1DCm",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"output\": {{ JSON.stringify($('AI Agent').item.json.output) }},\n\"status\": \"{{ $json.status }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        464,
+        -80
+      ],
+      "id": "e4990e0d-ef6f-429b-9d2e-15fb4ef29735",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Pegar resposta da IA (testa diferentes campos possíveis)\nlet output = $input.item.json.text || \n             $input.item.json.output || \n             $input.item.json.content || \n             $input.item.json.message?.content || \n             'Erro: resposta não encontrada';\n\n// Garantir que é string\nif (typeof output !== 'string') {\n  output = String(output);\n}\n\n// Limitar tamanho se muito grande\nif (output.length > 3000) {\n  output = output.substring(0, 2997) + '...';\n}\n\n// Escapar caracteres especiais para JSON válido\noutput = output\n  .replace(/\\\\/g, '\\\\\\\\')    // Escapar barras\n  .replace(/\"/g, '\\\\\"')      // Escapar aspas duplas\n  .replace(/\\n/g, '\\\\n')     // Quebras de linha\n  .replace(/\\r/g, '\\\\r')     // Retorno de carro\n  .replace(/\\t/g, '\\\\t')     // Tabs\n  .replace(/\\f/g, '\\\\f')     // Form feed\n  .replace(/\\b/g, '\\\\b');    // Backspace\n\nreturn [{\n  json: {\n    output: output,\n    status: 'success',\n    timestamp: new Date().toISOString(),\n    userId: $('Webhook').item.json.userId\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        272,
+        -80
+      ],
+      "id": "a094e845-345c-44ae-bfb7-6dd9ec56cd9c",
+      "name": "Code"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "5e401a70-8586-433f-b489-23ad8727e54a",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "bdaf2a43096dc8e1951de43c228f83695c6c4576f28735aaaa655eb36b6eac97"
+  },
+  "id": "4YXRHg90NO9tzt72",
+  "tags": []
+}
