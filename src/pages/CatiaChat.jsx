@@ -16,7 +16,7 @@ const sugestoes = [
 ];
 
 // ✅ URL correta do webhook no n8n
-const N8N_WEBHOOK_URL = "https://torrente.app.n8n.cloud/webhook/chat-catia";
+const N8N_WEBHOOK_URL = "https://universocatia.app.n8n.cloud/webhook/chat-catia";
 
 // Função para formatar respostas da CatIA
 const formatarResposta = (texto) => {
@@ -247,12 +247,19 @@ export default function CatiaChat() {
     });
 
     try {
+      // Pegar últimas 8 mensagens para melhor contexto (4 pares pergunta/resposta)
+      const historico = mensagens.slice(-8).map(msg => ({
+        autor: msg.autor === 'usuario' ? 'Usuário' : 'CatIA',
+        texto: msg.texto.substring(0, 200) // Limitar tamanho para não estourar tokens
+      }));
+
       const response = await fetch(N8N_WEBHOOK_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           pergunta: texto,
-          userId: user?.uid || "anonimo"
+          userId: user?.uid || "anonimo",
+          historico: historico
         })
       });
 
