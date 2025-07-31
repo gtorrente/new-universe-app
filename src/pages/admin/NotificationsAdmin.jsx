@@ -27,13 +27,15 @@ export default function NotificationsAdmin() {
   
   const [form, setForm] = useState({
     titulo: '',
-    corpo: '',
-    icone: '',
-    url: '',
+    mensagem: '',
+    tipo: 'geral',
     publico: 'todos',
-    dispositivo: 'todos',
     agendamento: '',
-    status: 'rascunho'
+    ativa: true,
+    link_acionavel: '',
+    icone: '🔔',
+    prioridade: 'normal',
+    visibilidade: 'badge_e_popup'
   });
 
   // Estados para estatísticas
@@ -56,7 +58,7 @@ export default function NotificationsAdmin() {
 
   useEffect(() => {
     loadData();
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const loadData = async () => {
     try {
@@ -75,7 +77,7 @@ export default function NotificationsAdmin() {
   const loadNotifications = async () => {
     try {
       const notificationsSnap = await getDocs(
-        query(collection(db, 'push_notifications'), orderBy('createdAt', 'desc'))
+        query(collection(db, 'notificacoes'), orderBy('createdAt', 'desc'))
       );
       const notificationsData = notificationsSnap.docs.map(doc => ({
         id: doc.id,
@@ -114,21 +116,31 @@ export default function NotificationsAdmin() {
 
   const handleSaveNotification = async () => {
     try {
+      // Gerar ID único se for nova notificação
+      const id = editingNotification?.id || `notificacao_${Date.now()}`;
+      
       const notificationData = {
-        ...form,
-        createdAt: serverTimestamp(),
+        id,
+        titulo: form.titulo,
+        mensagem: form.mensagem,
+        tipo: form.tipo,
+        publico: form.publico,
+        agendamento: form.agendamento ? new Date(form.agendamento).toISOString() : null,
+        ativa: form.ativa,
+        link_acionavel: form.link_acionavel,
+        icone: form.icone,
+        prioridade: form.prioridade,
+        visibilidade: form.visibilidade,
+        createdAt: editingNotification?.createdAt || serverTimestamp(),
         updatedAt: serverTimestamp(),
-        enviadas: 0,
-        cliques: 0
+        visualizacoes: editingNotification?.visualizacoes || 0,
+        cliques: editingNotification?.cliques || 0
       };
 
       if (editingNotification) {
-        await updateDoc(doc(db, 'push_notifications', editingNotification.id), {
-          ...notificationData,
-          createdAt: editingNotification.createdAt // Manter data original
-        });
+        await updateDoc(doc(db, 'notificacoes', editingNotification.id), notificationData);
       } else {
-        await addDoc(collection(db, 'push_notifications'), notificationData);
+        await addDoc(collection(db, 'notificacoes'), notificationData);
       }
 
       await loadNotifications();
@@ -136,13 +148,15 @@ export default function NotificationsAdmin() {
       setEditingNotification(null);
       setForm({
         titulo: '',
-        corpo: '',
-        icone: '',
-        url: '',
+        mensagem: '',
+        tipo: 'geral',
         publico: 'todos',
-        dispositivo: 'todos',
         agendamento: '',
-        status: 'rascunho'
+        ativa: true,
+        link_acionavel: '',
+        icone: '🔔',
+        prioridade: 'normal',
+        visibilidade: 'badge_e_popup'
       });
       
       alert(editingNotification ? 'Notificação atualizada!' : 'Notificação criada!');
@@ -155,7 +169,7 @@ export default function NotificationsAdmin() {
   const handleDeleteNotification = async (id, titulo) => {
     if (window.confirm(`Deletar notificação "${titulo}"?`)) {
       try {
-        await deleteDoc(doc(db, 'push_notifications', id));
+        await deleteDoc(doc(db, 'notificacoes', id));
         await loadNotifications();
         alert('Notificação deletada!');
       } catch (error) {
@@ -172,54 +186,25 @@ export default function NotificationsAdmin() {
   };
 
   const handleSendNotification = async (notification) => {
-    if (window.confirm(`Enviar notificação "${notification.titulo}" agora?`)) {
+    if (window.confirm(`Ativar notificação "${notification.titulo}" agora?`)) {
       try {
-        // Atualizar status para enviada
-        await updateDoc(doc(db, 'push_notifications', notification.id), {
-          status: 'enviada',
-          enviadaEm: serverTimestamp()
+        // Atualizar para ativa
+        await updateDoc(doc(db, 'notificacoes', notification.id), {
+          ativa: true,
+          ativadaEm: serverTimestamp(),
+          updatedAt: serverTimestamp()
         });
 
-        // Aqui você integraria com o serviço de push notifications
-        // Por exemplo: Firebase Cloud Messaging (FCM)
-        await sendPushNotification(notification);
-        
         await loadNotifications();
-        alert('Notificação enviada com sucesso!');
+        alert('Notificação ativada com sucesso!');
       } catch (error) {
-        console.error('Erro ao enviar notificação:', error);
-        alert('Erro ao enviar notificação.');
+        console.error('Erro ao ativar notificação:', error);
+        alert('Erro ao ativar notificação.');
       }
     }
   };
 
-  // Função para enviar push notification (implementação futura)
-  const sendPushNotification = async (notification) => {
-    console.log('🔔 Enviando push notification:', notification);
-    
-    // Implementação futura com FCM:
-    // 1. Buscar tokens dos dispositivos
-    // 2. Filtrar por público-alvo
-    // 3. Enviar via FCM API
-    // 4. Registrar estatísticas
-    
-    // Exemplo de payload:
-    const payload = {
-      notification: {
-        title: notification.titulo,
-        body: notification.corpo,
-        icon: notification.icone || '/icon-192x192.png',
-        click_action: notification.url || '/'
-      },
-      data: {
-        url: notification.url || '/',
-        timestamp: Date.now().toString()
-      }
-    };
-    
-    console.log('📤 Payload:', payload);
-    return Promise.resolve(); // Simular sucesso
-  };
+
 
   const handleTestNotification = async () => {
     // Enviar notificação de teste para o próprio admin
@@ -370,13 +355,15 @@ export default function NotificationsAdmin() {
                   setEditingNotification(null);
                   setForm({
                     titulo: '',
-                    corpo: '',
-                    icone: '',
-                    url: '',
+                    mensagem: '',
+                    tipo: 'geral',
                     publico: 'todos',
-                    dispositivo: 'todos',
                     agendamento: '',
-                    status: 'rascunho'
+                    ativa: true,
+                    link_acionavel: '',
+                    icone: '🔔',
+                    prioridade: 'normal',
+                    visibilidade: 'badge_e_popup'
                   });
                   setShowModal(true);
                 }}
@@ -393,10 +380,10 @@ export default function NotificationsAdmin() {
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Título</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tipo</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Público</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Dispositivo</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Estatísticas</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Prioridade</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ações</th>
                 </tr>
               </thead>
@@ -404,49 +391,60 @@ export default function NotificationsAdmin() {
                 {notifications.map((notification) => (
                   <tr key={notification.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div>
-                        <div className="text-sm font-medium text-gray-900">{notification.titulo}</div>
-                        <div className="text-sm text-gray-500">{notification.corpo}</div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-lg">{notification.icone}</span>
+                        <div>
+                          <div className="text-sm font-medium text-gray-900">{notification.titulo}</div>
+                          <div className="text-sm text-gray-500">{notification.mensagem}</div>
+                        </div>
                       </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className="inline-flex px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                        {notification.tipo}
+                      </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {notification.publico === 'todos' ? 'Todos os usuários' : notification.publico}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      <div className="flex items-center gap-1">
-                        {notification.dispositivo === 'mobile' ? 
-                          <FaMobileAlt className="text-blue-500" /> : 
-                          notification.dispositivo === 'desktop' ? 
-                          <FaDesktop className="text-gray-500" /> : 
-                          <FaUsers className="text-purple-500" />
-                        }
-                        {notification.dispositivo}
-                      </div>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
+                        notification.ativa 
+                          ? 'bg-green-100 text-green-800'
+                          : 'bg-gray-100 text-gray-800'
+                      }`}>
+                        {notification.ativa ? 'Ativa' : 'Inativa'}
+                      </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
-                        notification.status === 'enviada' 
-                          ? 'bg-green-100 text-green-800'
-                          : notification.status === 'agendada'
-                          ? 'bg-blue-100 text-blue-800'
-                          : 'bg-gray-100 text-gray-800'
+                        notification.prioridade === 'urgente' 
+                          ? 'bg-red-100 text-red-800'
+                          : notification.prioridade === 'baixa'
+                          ? 'bg-gray-100 text-gray-800'
+                          : 'bg-yellow-100 text-yellow-800'
                       }`}>
-                        {notification.status}
+                        {notification.prioridade}
                       </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      <div>Enviadas: {notification.enviadas || 0}</div>
-                      <div>Cliques: {notification.cliques || 0}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <div className="flex items-center gap-2">
-                        {notification.status === 'rascunho' && (
+                        {!notification.ativa && (
                           <button
                             onClick={() => handleSendNotification(notification)}
                             className="text-green-600 hover:text-green-900"
-                            title="Enviar agora"
+                            title="Ativar agora"
                           >
                             <FaPlay />
+                          </button>
+                        )}
+                        {notification.ativa && (
+                          <button
+                            onClick={() => handleSendNotification({...notification, ativa: false})}
+                            className="text-orange-600 hover:text-orange-900"
+                            title="Pausar"
+                          >
+                            <FaPause />
                           </button>
                         )}
                         <button
@@ -489,40 +487,58 @@ export default function NotificationsAdmin() {
                   value={form.titulo}
                   onChange={(e) => setForm({ ...form, titulo: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
-                  placeholder="Ex: Nova funcionalidade disponível!"
+                  placeholder="Ex: Nova Previsão Semanal"
                 />
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Corpo da Mensagem</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Mensagem</label>
                 <textarea
-                  value={form.corpo}
-                  onChange={(e) => setForm({ ...form, corpo: e.target.value })}
+                  value={form.mensagem}
+                  onChange={(e) => setForm({ ...form, mensagem: e.target.value })}
                   rows={3}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
-                  placeholder="Descreva o que o usuário verá na notificação"
+                  placeholder="A semana começou com novidades cósmicas! Veja o que os astros reservam pra você."
                 />
               </div>
               
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">URL do Ícone</label>
-                <input
-                  type="text"
-                  value={form.icone}
-                  onChange={(e) => setForm({ ...form, icone: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
-                  placeholder="/icon-192x192.png"
-                />
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Tipo</label>
+                  <select
+                    value={form.tipo}
+                    onChange={(e) => setForm({ ...form, tipo: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                  >
+                    <option value="geral">Geral</option>
+                    <option value="previsao">Previsão</option>
+                    <option value="tarot">Tarot</option>
+                    <option value="receitas">Receitas</option>
+                    <option value="promocao">Promoção</option>
+                    <option value="manutencao">Manutenção</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Ícone</label>
+                  <input
+                    type="text"
+                    value={form.icone}
+                    onChange={(e) => setForm({ ...form, icone: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                    placeholder="🪐"
+                  />
+                </div>
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">URL de Destino</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Link Acionável</label>
                 <input
                   type="text"
-                  value={form.url}
-                  onChange={(e) => setForm({ ...form, url: e.target.value })}
+                  value={form.link_acionavel}
+                  onChange={(e) => setForm({ ...form, link_acionavel: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
-                  placeholder="/tarot"
+                  placeholder="/previsao-da-semana"
                 />
               </div>
               
@@ -534,37 +550,64 @@ export default function NotificationsAdmin() {
                     onChange={(e) => setForm({ ...form, publico: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
                   >
-                    <option value="todos">Todos os usuários</option>
-                    <option value="ativos">Usuários ativos</option>
-                    <option value="inativos">Usuários inativos</option>
-                    <option value="premium">Usuários premium</option>
+                    <option value="todos">Todos</option>
+                    <option value="premium">Premium</option>
+                    <option value="free">Free</option>
+                    <option value="sem_creditos">Sem Créditos</option>
                   </select>
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Dispositivo</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Prioridade</label>
                   <select
-                    value={form.dispositivo}
-                    onChange={(e) => setForm({ ...form, dispositivo: e.target.value })}
+                    value={form.prioridade}
+                    onChange={(e) => setForm({ ...form, prioridade: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
                   >
-                    <option value="todos">Todos</option>
-                    <option value="mobile">Mobile</option>
-                    <option value="desktop">Desktop</option>
+                    <option value="baixa">Baixa</option>
+                    <option value="normal">Normal</option>
+                    <option value="urgente">Urgente</option>
                   </select>
                 </div>
               </div>
               
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Visibilidade</label>
+                  <select
+                    value={form.visibilidade}
+                    onChange={(e) => setForm({ ...form, visibilidade: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                  >
+                    <option value="badge_e_popup">Badge e Popup</option>
+                    <option value="badge">Apenas Badge</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                  <div className="flex items-center gap-3 pt-2">
+                    <label className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        checked={form.ativa}
+                        onChange={(e) => setForm({ ...form, ativa: e.target.checked })}
+                        className="w-4 h-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
+                      />
+                      <span className="text-sm text-gray-700">Ativa</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+              
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                <select
-                  value={form.status}
-                  onChange={(e) => setForm({ ...form, status: e.target.value })}
+                <label className="block text-sm font-medium text-gray-700 mb-1">Agendamento (opcional)</label>
+                <input
+                  type="datetime-local"
+                  value={form.agendamento}
+                  onChange={(e) => setForm({ ...form, agendamento: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
-                >
-                  <option value="rascunho">Rascunho</option>
-                  <option value="agendada">Agendada</option>
-                </select>
+                />
               </div>
             </div>
             

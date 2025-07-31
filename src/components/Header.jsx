@@ -3,11 +3,22 @@ import { useNavigate } from "react-router-dom";
 import { FaCoins } from "react-icons/fa";
 import { FiBell } from "react-icons/fi";
 import avatarDefault from '../assets/avatar.png';
+import { useNotificacoes } from '../hooks/useNotificacoes';
+import NotificacoesModal from './NotificacoesModal';
 
 export default function Header({ user, creditos }) {
   const [openCreditos, setOpenCreditos] = useState(false);
+  const [showNotificacoes, setShowNotificacoes] = useState(false);
   const creditosRef = useRef(null);
   const navigate = useNavigate();
+  
+  // Hook de notificações
+  const { 
+    notificacoes, 
+    novasNotificacoes, 
+    marcarComoVista, 
+    marcarTodasComoVistas 
+  } = useNotificacoes();
 
   // Fecha o menu ao clicar fora
   useEffect(() => {
@@ -53,8 +64,17 @@ export default function Header({ user, creditos }) {
       </div>
       {/* Notificações + Créditos */}
       <div className="flex items-center gap-2">
-        <button className="p-2">
-          <FiBell className="w-6 h-6 text-gray-500" />
+        {/* Botão de Notificações com Badge */}
+        <button 
+          className="p-2 relative"
+          onClick={() => setShowNotificacoes(true)}
+        >
+          <FiBell className="w-6 h-6 text-gray-500 hover:text-gray-700 transition" />
+          {novasNotificacoes > 0 && (
+            <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center animate-pulse">
+              {novasNotificacoes > 9 ? '9+' : novasNotificacoes}
+            </div>
+          )}
         </button>
         {/* Créditos Popover */}
         <div className="relative" ref={creditosRef}>
@@ -88,6 +108,18 @@ export default function Header({ user, creditos }) {
           )}
         </div>
       </div>
+      
+      {/* Modal de Notificações */}
+      <NotificacoesModal
+        isOpen={showNotificacoes}
+        onClose={() => setShowNotificacoes(false)}
+        notificacoes={notificacoes}
+        onNotificacaoClick={marcarComoVista}
+        onMarcarTodasVistas={() => {
+          marcarTodasComoVistas();
+          setShowNotificacoes(false);
+        }}
+      />
     </header>
   );
 } 

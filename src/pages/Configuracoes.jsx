@@ -243,7 +243,7 @@ export default function Configuracoes() {
         </div>
 
         {/* Aparência */}
-        <div className="bg-white rounded-2xl shadow-sm border border-purple-100 p-6">
+        {/* <div className="bg-white rounded-2xl shadow-sm border border-purple-100 p-6">
           <div className="flex items-center gap-3 mb-4">
             <div className="p-2 bg-yellow-100 rounded-lg">
               {settings.appearance.darkMode ? (
@@ -292,10 +292,10 @@ export default function Configuracoes() {
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
 
         {/* Som */}
-        <div className="bg-white rounded-2xl shadow-sm border border-purple-100 p-6">
+        {/* <div className="bg-white rounded-2xl shadow-sm border border-purple-100 p-6">
           <div className="flex items-center gap-3 mb-4">
             <div className="p-2 bg-green-100 rounded-lg">
               {settings.sound.enabled ? (
@@ -339,7 +339,7 @@ export default function Configuracoes() {
               </div>
             )}
           </div>
-        </div>
+        </div> */}
 
         {/* Privacidade */}
         <div className="bg-white rounded-2xl shadow-sm border border-purple-100 p-6">
