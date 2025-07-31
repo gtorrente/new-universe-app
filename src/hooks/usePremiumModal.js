@@ -33,8 +33,13 @@ export const usePremiumModal = () => {
     }
   };
 
+  const handleOpenModal = () => {
+    console.log('🚀 Abrindo modal premium');
+    setShowModal(true);
+  };
+
   const handleSubscribe = (planType) => {
-    console.log('Usuário quer assinar:', planType);
+    console.log('💳 Usuário quer assinar:', planType);
     // Aqui você pode integrar com o sistema de pagamento
     // Por exemplo: Stripe, Mercado Pago, etc.
     
@@ -48,7 +53,8 @@ export const usePremiumModal = () => {
   return {
     showModal,
     user,
-    handleCloseModal,
-    handleSubscribe
+    handleOpenModal,  // ✅ NOVO: Abre modal
+    handleCloseModal, // ✅ Fecha modal  
+    handleSubscribe   // ✅ Processa assinatura (fecha modal)
   };
 }; 

@@ -220,6 +220,7 @@ export default function Home() {
   // Hook do modal premium para onboarding
   const { 
     showModal: showPremiumModal, 
+    handleOpenModal,    // ✅ NOVO: Para abrir modal
     handleCloseModal, 
     handleSubscribe 
   } = usePremiumModal();
@@ -490,7 +491,7 @@ export default function Home() {
 
       {/* Carrossel de Benefícios Premium */}
       <div className="mt-8 mb-6">
-        <PremiumBenefitsCarousel onSubscribeClick={handleSubscribe} />
+        <PremiumBenefitsCarousel onSubscribeClick={handleOpenModal} />
       </div>
 
       {/* Modal Premium para Onboarding */}

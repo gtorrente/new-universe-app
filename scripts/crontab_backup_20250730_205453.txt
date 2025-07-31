@@ -1,0 +1,2 @@
+0 6 * * 1 cd /Users/gustavotorrente/new-universe-app/mistic-app/scripts && node cron-horoscopo.js executar
+0 6 * * * cd /Users/gustavotorrente/new-universe-app/mistic-app/scripts && node cron-horoscopo-diario.js executar
