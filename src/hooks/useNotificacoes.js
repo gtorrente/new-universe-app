@@ -31,8 +31,7 @@ export function useNotificacoes() {
       
       const q = query(
         collection(db, 'notificacoes'),
-        where('ativa', '==', true),
-        orderBy('createdAt', 'desc')
+        where('ativa', '==', true)
       );
       
       const snapshot = await getDocs(q);
@@ -60,16 +59,23 @@ export function useNotificacoes() {
         return dataAgendamento <= agora; // Apenas se já passou do horário agendado
       });
 
-      setNotificacoes(notificacoesAtivas);
-      
-      // Calcular notificações não visualizadas pelo usuário
-      // Por simplicidade, vamos usar localStorage para tracking
-      const visualizadas = JSON.parse(localStorage.getItem(`notif_vistas_${user.uid}`) || '[]');
-      const naoVisualizadas = notificacoesAtivas.filter(notif => 
-        !visualizadas.includes(notif.id)
-      );
-      
-      setNovasNotificacoes(naoVisualizadas.length);
+              // Ordenar por data (mais recentes primeiro) no JavaScript
+        notificacoesAtivas.sort((a, b) => {
+          const dataA = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(a.createdAt);
+          const dataB = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(b.createdAt);
+          return dataB - dataA;
+        });
+        
+        setNotificacoes(notificacoesAtivas);
+        
+        // Calcular notificações não visualizadas pelo usuário
+        // Por simplicidade, vamos usar localStorage para tracking
+        const visualizadas = JSON.parse(localStorage.getItem(`notif_vistas_${user.uid}`) || '[]');
+        const naoVisualizadas = notificacoesAtivas.filter(notif => 
+          !visualizadas.includes(notif.id)
+        );
+        
+        setNovasNotificacoes(naoVisualizadas.length);
       
       console.log(`📊 Encontradas ${notificacoesAtivas.length} notificações, ${naoVisualizadas.length} novas`);
       

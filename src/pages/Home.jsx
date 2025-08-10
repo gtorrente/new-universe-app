@@ -189,9 +189,41 @@ function useHoroscopo(signoEn) {
       console.log('🌐 Horóscopo carregado da API e salvo no cache');
       
     } catch (err) {
-      console.error("Erro ao buscar horóscopo diário:", err);
-      setError("Não foi possível carregar o horóscopo hoje.");
-      setHoroscopo("Horóscopo temporariamente indisponível.");
+      console.error("Erro ao buscar horóscopo diário da API:", err);
+      
+      // Fallback: Buscar diretamente do Firebase
+      try {
+        console.log('🔄 Tentando buscar horóscopo diretamente do Firebase...');
+        
+        const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+        const horoscopoRef = doc(db, 'horoscopo_diario', today, signo, 'horoscopo');
+        const horoscopoSnap = await getDoc(horoscopoRef);
+        
+        if (horoscopoSnap.exists()) {
+          const horoscopoData = horoscopoSnap.data();
+          const horoscopoTexto = horoscopoData.texto || "Horóscopo indisponível.";
+          
+          setHoroscopo(horoscopoTexto);
+          setError(null);
+          
+          // Salva no cache
+          const cacheData = {
+            data: horoscopoTexto,
+            timestamp: Date.now()
+          };
+          
+          horoscopoDiarioCache.set(cacheKey, cacheData);
+          localStorage.setItem(`horoscopo-diario-${cacheKey}`, JSON.stringify(cacheData));
+          
+          console.log('✅ Horóscopo carregado diretamente do Firebase');
+        } else {
+          throw new Error('Horóscopo não encontrado no Firebase');
+        }
+      } catch (firebaseErr) {
+        console.error("Erro ao buscar do Firebase:", firebaseErr);
+        setError("Não foi possível carregar o horóscopo hoje.");
+        setHoroscopo("Horóscopo temporariamente indisponível.");
+      }
     } finally {
       setLoading(false);
     }

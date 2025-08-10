@@ -230,7 +230,7 @@ const PremiumBenefitsCarousel = ({ onSubscribeClick }) => {
       </div>
 
       {/* CSS customizado para remover scrollbar completamente */}
-      <style jsx>{`
+      <style>{`
         .scrollbar-hide {
           -ms-overflow-style: none;  /* IE and Edge */
           scrollbar-width: none;  /* Firefox */

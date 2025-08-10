@@ -1,0 +1,1 @@
+console.log('Limpando cache de horóscopo...'); localStorage.removeItem('horoscopo-diario-'); Object.keys(localStorage).forEach(key => { if (key.startsWith('horoscopo-diario-')) localStorage.removeItem(key); }); console.log('Cache limpo!');

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { db } from '../../firebaseConfigFront';
 import { collection, getDocs, doc, updateDoc, deleteDoc } from 'firebase/firestore';
-import { FaArrowLeft, FaEdit, FaTrash, FaCrown, FaCoins, FaUser } from 'react-icons/fa';
+import { FaArrowLeft, FaEdit, FaTrash, FaCrown, FaCoins, FaUser, FaStar, FaGem } from 'react-icons/fa';
 
 export default function UsersAdmin() {
   const navigate = useNavigate();
@@ -14,7 +14,9 @@ export default function UsersAdmin() {
     nome: '',
     email: '',
     creditos: 0,
-    isAdmin: false
+    isAdmin: false,
+    isPremium: false,
+    plano: 'free'
   });
 
   useEffect(() => {
@@ -55,7 +57,9 @@ export default function UsersAdmin() {
       nome: user.nome || '',
       email: user.email || '',
       creditos: user.creditos || 0,
-      isAdmin: user.isAdmin || false
+      isAdmin: user.isAdmin || false,
+      isPremium: user.isPremium || false,
+      plano: user.plano || 'free'
     });
   };
 
@@ -67,7 +71,11 @@ export default function UsersAdmin() {
       await updateDoc(userRef, {
         nome: editForm.nome,
         creditos: parseInt(editForm.creditos),
-        isAdmin: editForm.isAdmin
+        isAdmin: editForm.isAdmin,
+        isPremium: editForm.isPremium,
+        plano: editForm.plano,
+        // Atualizar subscription para compatibilidade
+        subscription: editForm.isPremium ? { active: true, updatedAt: new Date() } : { active: false, updatedAt: new Date() }
       });
       
       // Atualizar lista local
@@ -98,10 +106,48 @@ export default function UsersAdmin() {
     }
   };
 
+  const togglePremium = async (user) => {
+    const currentPremiumStatus = user.isPremium || user.plano === 'premium' || user.subscription?.active;
+    const newPremiumStatus = !currentPremiumStatus;
+    
+    try {
+      const userRef = doc(db, 'usuarios', user.id);
+      await updateDoc(userRef, {
+        isPremium: newPremiumStatus,
+        plano: newPremiumStatus ? 'premium' : 'free',
+        subscription: { active: newPremiumStatus, updatedAt: new Date() }
+      });
+      
+      // Atualizar lista local
+      setUsers(users.map(u => 
+        u.id === user.id 
+          ? { 
+              ...u, 
+              isPremium: newPremiumStatus,
+              plano: newPremiumStatus ? 'premium' : 'free',
+              subscription: { active: newPremiumStatus, updatedAt: new Date() }
+            }
+          : u
+      ));
+      
+      alert(`Usuário ${newPremiumStatus ? 'promovido para Premium' : 'rebaixado para Gratuito'} com sucesso!`);
+    } catch (error) {
+      console.error('Erro ao alterar status premium:', error);
+      alert('Erro ao alterar status premium.');
+    }
+  };
+
   const filteredUsers = users.filter(user =>
     user.nome?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     user.email?.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  // Estatísticas de usuários
+  const premiumUsers = users.filter(user => 
+    user.isPremium || user.plano === 'premium' || user.subscription?.active
+  ).length;
+  const adminUsers = users.filter(user => user.isAdmin).length;
+  const totalCredits = users.reduce((sum, user) => sum + (user.creditos || 0), 0);
 
   if (loading) {
     return (
@@ -128,9 +174,24 @@ export default function UsersAdmin() {
               <h1 className="text-3xl font-bold text-gray-900">
                 👥 Gerenciar Usuários
               </h1>
-              <p className="text-gray-600">
-                Total: {users.length} usuários
-              </p>
+              <div className="flex items-center gap-6 mt-2">
+                <div className="flex items-center gap-1 text-gray-600">
+                  <FaUser className="text-gray-500" />
+                  <span>Total: {users.length}</span>
+                </div>
+                <div className="flex items-center gap-1 text-orange-600">
+                  <FaGem className="text-orange-500" />
+                  <span>Premium: {premiumUsers}</span>
+                </div>
+                <div className="flex items-center gap-1 text-purple-600">
+                  <FaCrown className="text-purple-500" />
+                  <span>Admins: {adminUsers}</span>
+                </div>
+                <div className="flex items-center gap-1 text-yellow-600">
+                  <FaCoins className="text-yellow-500" />
+                  <span>Créditos: {totalCredits.toLocaleString()}</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -169,6 +230,9 @@ export default function UsersAdmin() {
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Créditos
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Plano
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Admin
@@ -210,6 +274,24 @@ export default function UsersAdmin() {
                         <FaCoins className="text-yellow-500" />
                         <span className="text-sm font-medium">{user.creditos || 0}</span>
                       </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <button
+                        onClick={() => togglePremium(user)}
+                        className="transition-all duration-200 hover:scale-105"
+                      >
+                        {user.isPremium || user.plano === 'premium' || user.subscription?.active ? (
+                          <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-yellow-100 to-orange-100 text-orange-800 border border-orange-200 hover:from-yellow-200 hover:to-orange-200 cursor-pointer">
+                            <FaGem className="text-orange-600" />
+                            Premium
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800 hover:bg-gray-200 cursor-pointer">
+                            <FaStar className="text-gray-500" />
+                            Gratuito
+                          </span>
+                        )}
+                      </button>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       {user.isAdmin ? (
@@ -290,6 +372,56 @@ export default function UsersAdmin() {
                   onChange={(e) => setEditForm({ ...editForm, creditos: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
                 />
+              </div>
+
+              {/* Seção Premium */}
+              <div className="border-t pt-4">
+                <h4 className="text-sm font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                  <FaGem className="text-orange-600" />
+                  Configurações Premium
+                </h4>
+                
+                <div className="space-y-3">
+                  <div>
+                    <label className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        checked={editForm.isPremium}
+                        onChange={(e) => {
+                          const isPremium = e.target.checked;
+                          setEditForm({ 
+                            ...editForm, 
+                            isPremium,
+                            plano: isPremium ? 'premium' : 'free'
+                          });
+                        }}
+                        className="rounded border-gray-300 text-orange-600 focus:ring-orange-500"
+                      />
+                      <span className="text-sm font-medium text-gray-700">
+                        Usuário Premium
+                      </span>
+                    </label>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Tipo de Plano
+                    </label>
+                    <select
+                      value={editForm.plano}
+                      onChange={(e) => setEditForm({ 
+                        ...editForm, 
+                        plano: e.target.value,
+                        isPremium: e.target.value === 'premium'
+                      })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
+                    >
+                      <option value="free">Gratuito</option>
+                      <option value="premium">Premium</option>
+                      <option value="vip">VIP</option>
+                    </select>
+                  </div>
+                </div>
               </div>
               
               <div>

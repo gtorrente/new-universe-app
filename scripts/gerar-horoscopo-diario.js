@@ -52,11 +52,16 @@ function getDayName(date = new Date()) {
   return dias[date.getDay()];
 }
 
+// Utilitário: cria Date a partir de chave AAAA-MM-DD (no meio do dia para evitar TZ)
+function dateFromKey(dateKey) {
+  return new Date(`${dateKey}T12:00:00`);
+}
+
 // Função para gerar horóscopo diário de um signo
-async function gerarHoroscopoDiario(signo, nomeSigno) {
+async function gerarHoroscopoDiario(signo, nomeSigno, targetDate) {
   try {
-    const hoje = new Date();
-    const diaSemana = getDayName(hoje);
+    const diaBase = targetDate ? (typeof targetDate === 'string' ? dateFromKey(targetDate) : targetDate) : new Date();
+    const diaSemana = getDayName(diaBase);
     
     console.log(`🔮 Gerando horóscopo diário para ${nomeSigno} (${diaSemana})...`);
     
@@ -120,7 +125,7 @@ IMPORTANTE: Retorne APENAS o texto da previsão, sem aspas ou formatação adici
       signo: signo,
       nome_signo: nomeSigno,
       dia_semana: diaSemana,
-      data: hoje.toISOString().split('T')[0],
+      data: getDayKey(diaBase),
       created_at: new Date(),
       updated_at: new Date(),
       status: 'ativo',
@@ -137,9 +142,9 @@ IMPORTANTE: Retorne APENAS o texto da previsão, sem aspas ou formatação adici
 }
 
 // Função para salvar horóscopo no Firebase
-async function salvarHoroscopoDiario(horoscopo) {
+async function salvarHoroscopoDiario(horoscopo, targetDate) {
   try {
-    const diaKey = getDayKey();
+    const diaKey = targetDate ? (typeof targetDate === 'string' ? targetDate : getDayKey(targetDate)) : getDayKey();
     const docRef = doc(db, 'horoscopos_diarios', diaKey, 'signos', horoscopo.signo);
     
     await setDoc(docRef, horoscopo);
@@ -152,17 +157,18 @@ async function salvarHoroscopoDiario(horoscopo) {
 }
 
 // Função principal para gerar todos os horóscopos diários
-async function gerarTodosHoroscoposDiarios(force = false) {
+async function gerarTodosHoroscoposDiarios(force = false, targetDate) {
   try {
     console.log('🚀 Iniciando geração de horóscopos diários...');
-    console.log('📅 Data:', new Date().toLocaleString('pt-BR'));
+    const base = targetDate ? (typeof targetDate === 'string' ? dateFromKey(targetDate) : targetDate) : new Date();
+    console.log('📅 Data base:', base.toLocaleString('pt-BR'));
     
     // Verificar se OpenAI está configurada
     if (!process.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY === 'your_openai_api_key_here') {
       throw new Error('❌ OpenAI API Key não configurada! Configure OPENAI_API_KEY no arquivo .env');
     }
 
-    const diaAtual = getDayKey();
+    const diaAtual = targetDate ? (typeof targetDate === 'string' ? targetDate : getDayKey(base)) : getDayKey(base);
     console.log(`📅 Dia atual: ${diaAtual}`);
     console.log('');
 
@@ -187,8 +193,8 @@ async function gerarTodosHoroscoposDiarios(force = false) {
     // Gerar horóscopos para todos os signos
     const promises = Object.entries(signos).map(async ([signo, nomeSigno]) => {
       try {
-        const horoscopo = await gerarHoroscopoDiario(signo, nomeSigno);
-        await salvarHoroscopoDiario(horoscopo);
+        const horoscopo = await gerarHoroscopoDiario(signo, nomeSigno, diaAtual);
+        await salvarHoroscopoDiario(horoscopo, diaAtual);
         return { signo, success: true };
       } catch (error) {
         console.error(`❌ Falha ao gerar horóscopo para ${nomeSigno}:`, error);
@@ -226,9 +232,9 @@ async function gerarTodosHoroscoposDiarios(force = false) {
 }
 
 // Função para verificar status
-async function verificarStatus() {
+async function verificarStatus(targetDate) {
   try {
-    const diaAtual = getDayKey();
+    const diaAtual = targetDate ? (typeof targetDate === 'string' ? targetDate : getDayKey(targetDate)) : getDayKey();
     console.log(`📅 Verificando status para: ${diaAtual}`);
     
     const statusDoc = await getDoc(doc(db, 'horoscopos_diarios', diaAtual, 'config', 'status'));
@@ -250,7 +256,7 @@ async function verificarStatus() {
 }
 
 // Função para gerar horóscopo de um signo específico
-async function gerarHoroscopoSignoEspecifico(signo) {
+async function gerarHoroscopoSignoEspecifico(signo, targetDate) {
   try {
     if (!signos[signo]) {
       throw new Error(`Signo inválido: ${signo}. Signos válidos: ${Object.keys(signos).join(', ')}`);
@@ -258,14 +264,23 @@ async function gerarHoroscopoSignoEspecifico(signo) {
 
     console.log(`🔮 Gerando horóscopo diário para ${signos[signo]}...`);
     
-    const horoscopo = await gerarHoroscopoDiario(signo, signos[signo]);
-    await salvarHoroscopoDiario(horoscopo);
+    const horoscopo = await gerarHoroscopoDiario(signo, signos[signo], targetDate);
+    await salvarHoroscopoDiario(horoscopo, targetDate);
     
     console.log(`✅ Horóscopo gerado com sucesso para ${signos[signo]}!`);
     
   } catch (error) {
     console.error(`❌ Erro ao gerar horóscopo para ${signo}:`, error);
     throw error;
+  }
+}
+
+// Geração para múltiplas datas (array de chaves AAAA-MM-DD)
+async function gerarParaDatas(datas, force = false) {
+  for (const dk of datas) {
+    console.log('\n============================');
+    console.log(`📅 Gerando pacote para ${dk}`);
+    await gerarTodosHoroscoposDiarios(force, dk);
   }
 }
 
@@ -276,11 +291,19 @@ const command = args[0];
 switch (command) {
   case 'gerar':
     const force = args.includes('--force');
-    gerarTodosHoroscoposDiarios(force);
+    // Suporte opcional a --date AAAA-MM-DD
+    const dateIndex = args.indexOf('--date');
+    const dateKey = dateIndex !== -1 ? args[dateIndex + 1] : undefined;
+    gerarTodosHoroscoposDiarios(force, dateKey);
     break;
     
   case 'status':
-    verificarStatus();
+    // Suporte opcional a --date AAAA-MM-DD
+    {
+      const dIdx = args.indexOf('--date');
+      const dKey = dIdx !== -1 ? args[dIdx + 1] : undefined;
+      verificarStatus(dKey);
+    }
     break;
     
   case 'signo':
@@ -289,7 +312,23 @@ switch (command) {
       console.error('❌ Especifique o signo: npm run diario:signo <signo>');
       process.exit(1);
     }
-    gerarHoroscopoSignoEspecifico(signo);
+    {
+      const dIdx = args.indexOf('--date');
+      const dKey = dIdx !== -1 ? args[dIdx + 1] : undefined;
+      gerarHoroscopoSignoEspecifico(signo, dKey);
+    }
+    break;
+
+  case 'datas': {
+    // Ex.: node gerar-horoscopo-diario.js datas 2025-08-08 2025-08-09 ...
+    const datas = args.slice(1).filter(Boolean);
+    if (datas.length === 0) {
+      console.error('❌ Informe ao menos uma data no formato AAAA-MM-DD');
+      process.exit(1);
+    }
+    const forceMulti = args.includes('--force');
+    gerarParaDatas(datas, forceMulti);
+  }
     break;
     
   default:
@@ -297,7 +336,9 @@ switch (command) {
     console.log('  npm run diario:gerar     - Gerar horóscopos para todos os signos');
     console.log('  npm run diario:gerar --force - Forçar regeneração');
     console.log('  npm run diario:status    - Verificar status da geração');
-    console.log('  npm run diario:signo <s> - Gerar horóscopo para signo específico');
+    console.log('  npm run diario:signo <s> [-date AAAA-MM-DD] - Gerar para um signo (data opcional)');
+    console.log('  node gerar-horoscopo-diario.js gerar --date AAAA-MM-DD  - Gerar para uma data específica');
+    console.log('  node gerar-horoscopo-diario.js datas <AAAA-MM-DD...>    - Gerar para múltiplas datas');
     console.log('');
     console.log('📝 EXEMPLOS:');
     console.log('  npm run diario:gerar');

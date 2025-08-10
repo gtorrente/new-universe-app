@@ -46,7 +46,9 @@ function isCacheValid(timestamp) {
 function getWeekCacheKey(signo) {
   const now = new Date();
   const startOfWeek = new Date(now.setDate(now.getDate() - now.getDay()));
-  const weekKey = startOfWeek.toISOString().split('T')[0]; // YYYY-MM-DD
+  const year = startOfWeek.getFullYear();
+  const weekNumber = Math.ceil((startOfWeek.getDate() + startOfWeek.getDay()) / 7);
+  const weekKey = `${year}-W${weekNumber.toString().padStart(2, '0')}`;
   return `${signo}-${weekKey}`;
 }
 
@@ -196,56 +198,55 @@ export default function PrevisaoSemanal() {
       // Ignora erros de cache corrompido
     }
 
-    // 3. Busca na API apenas se não há cache válido
+    // 3. Busca direto no Firebase (pular API externa)
     try {
       setLoading(true);
       setError(null);
       
-      // Verificar se VITE_API_URL está configurada
-      const apiUrl = import.meta.env.VITE_API_URL || 'https://api.torrente.com.br';
-      console.log('🌐 Previsão: Usando API URL:', apiUrl);
+      console.log('🔄 Buscando horóscopo semanal diretamente do Firebase...');
       
-      console.log("🌐 Previsão: Fazendo chamada para API com signo:", signo);
-      console.log("🌐 Previsão: URL da API:", `${apiUrl}/horoscopo-semanal`);
+      // Obter a semana atual (mesma lógica do script de geração)
+      const now = new Date();
+      const startOfWeek = new Date(now.setDate(now.getDate() - now.getDay()));
+      const year = startOfWeek.getFullYear();
+      const weekNumber = Math.ceil((startOfWeek.getDate() + startOfWeek.getDay()) / 7);
+      const weekKey = `${year}-W${weekNumber.toString().padStart(2, '0')}`;
+
+      console.log('📅 Calculando semana:', weekKey);
+
+      // Buscar diretamente do Firebase
+      const horoscopoRef = doc(db, 'horoscopos_semanais', weekKey, 'signos', signo);
+      const horoscopoSnap = await getDoc(horoscopoRef);
       
-      const res = await fetch(`${apiUrl}/horoscopo-semanal?sign=${signo}`, {
-        method: "GET",
-        headers: { "Content-Type": "application/json" }
-      });
-
-      console.log("📡 Previsão: Resposta da API status:", res.status);
-
-      if (!res.ok) {
-        throw new Error(`Erro na API: ${res.status}`);
+      if (!horoscopoSnap.exists()) {
+        throw new Error(`Horóscopo semanal não encontrado para ${signo} na semana ${weekKey}`);
       }
 
-      const data = await res.json();
-      console.log("✅ Previsão: Dados recebidos da API:", data);
-      
-      if (!data.success) {
-        throw new Error(data.error || "Erro na API");
-      }
-      
+      const h = horoscopoSnap.data();
+      console.log('✅ Horóscopo semanal carregado do Firebase:', h);
+
+      // Estrutura salva pelo script: destaque + dias (segunda...domingo)
+      const destaque = h.destaque || { titulo: 'Previsão Semanal', mensagem: 'Confira sua semana!', icone: 'FaStar' };
       const semanaFormatada = [
-        { dia: "Seg", ...data.data.semana.segunda },
-        { dia: "Ter", ...data.data.semana.terca },
-        { dia: "Qua", ...data.data.semana.quarta },
-        { dia: "Qui", ...data.data.semana.quinta },
-        { dia: "Sex", ...data.data.semana.sexta },
-        { dia: "Sáb", ...data.data.semana.sabado },
-        { dia: "Dom", ...data.data.semana.domingo }
+        { dia: 'Seg', tema: h.segunda?.tema, trecho: h.segunda?.trecho, icone: h.segunda?.icone },
+        { dia: 'Ter', tema: h.terca?.tema, trecho: h.terca?.trecho, icone: h.terca?.icone },
+        { dia: 'Qua', tema: h.quarta?.tema, trecho: h.quarta?.trecho, icone: h.quarta?.icone },
+        { dia: 'Qui', tema: h.quinta?.tema, trecho: h.quinta?.trecho, icone: h.quinta?.icone },
+        { dia: 'Sex', tema: h.sexta?.tema, trecho: h.sexta?.trecho, icone: h.sexta?.icone },
+        { dia: 'Sáb', tema: h.sabado?.tema, trecho: h.sabado?.trecho, icone: h.sabado?.icone },
+        { dia: 'Dom', tema: h.domingo?.tema, trecho: h.domingo?.trecho, icone: h.domingo?.icone },
       ];
 
-      setDestaque(data.data.destaque);
+      setDestaque(destaque);
       setSemana(semanaFormatada);
-      setMensagemAudioCatia(data.data.destaque?.mensagem_audio || data.data.destaque?.mensagem || "");
+      setMensagemAudioCatia(destaque.mensagem_audio || "");
 
-      // 4. Salva no cache (memória + localStorage)
+      // Salva no cache
       const cacheData = {
         data: {
-          destaque: data.data.destaque,
+          destaque,
           semana: semanaFormatada,
-          mensagem_audio_catia: data.data.destaque?.mensagem_audio || data.data.destaque?.mensagem || ""
+          mensagem_audio_catia: destaque.mensagem_audio || ""
         },
         timestamp: Date.now()
       };
@@ -253,10 +254,10 @@ export default function PrevisaoSemanal() {
       horoscopoCache.set(cacheKey, cacheData);
       localStorage.setItem(`horoscopo-${cacheKey}`, JSON.stringify(cacheData));
       
-      console.log('🌐 Dados carregados da API e salvos no cache');
+      console.log('✅ Horóscopo semanal carregado diretamente do Firebase e salvo no cache');
       
     } catch (err) {
-      console.error("Erro ao buscar horóscopo semanal:", err);
+      console.error("Erro ao buscar horóscopo semanal do Firebase:", err);
       setError("Não foi possível carregar a previsão semanal. Tente novamente.");
     } finally {
       setLoading(false);
@@ -444,7 +445,10 @@ export default function PrevisaoSemanal() {
           <div className="text-base text-gray-700 text-center mb-2">
             Hora de rever seus planos e se priorizar. Esta semana reserva boas surpresas! 🌟
           </div>
-          <button className="mt-2 px-5 py-2 rounded-xl bg-gradient-to-r from-pink-500 to-purple-500 text-white font-bold shadow hover:scale-105 transition">
+          <button 
+            onClick={() => navigate('/mapa-astral')}
+            className="mt-2 px-5 py-2 rounded-xl bg-gradient-to-r from-pink-500 to-purple-500 text-white font-bold shadow hover:scale-105 transition"
+          >
             Fazer meu Mapa Astral completo
           </button>
         </div>

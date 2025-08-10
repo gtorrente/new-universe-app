@@ -6,7 +6,7 @@ import avatarDefault from '../assets/avatar.png';
 import { useNotificacoes } from '../hooks/useNotificacoes';
 import NotificacoesModal from './NotificacoesModal';
 
-export default function Header({ user, creditos }) {
+export default function Header({ user, creditos, isWhiteText = false }) {
   const [openCreditos, setOpenCreditos] = useState(false);
   const [showNotificacoes, setShowNotificacoes] = useState(false);
   const creditosRef = useRef(null);
@@ -32,7 +32,7 @@ export default function Header({ user, creditos }) {
   }, []);
 
   const handleAvatarClick = () => {
-    navigate('/perfil');
+    navigate('/');
   };
 
   return (
@@ -57,7 +57,7 @@ export default function Header({ user, creditos }) {
             }}
           />
         </div>
-        <span className="text-lg font-semibold text-gray-800">
+        <span className={`text-lg font-semibold ${isWhiteText ? 'text-white drop-shadow-lg' : 'text-gray-800'}`}>
           Olá, {user?.displayName?.split(" ")[0] || "Visitante"}
         </span>
         {/* Popover Menu */}

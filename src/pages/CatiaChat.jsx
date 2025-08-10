@@ -4,7 +4,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { AiOutlineSend } from "react-icons/ai";
 import Header from "../components/Header";
 import { auth, db } from "../firebaseConfigFront";
-import { doc, getDoc, collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { doc, getDoc, collection, addDoc, serverTimestamp, setDoc } from "firebase/firestore";
 
 // Sugestões de perguntas para facilitar a interação
 const sugestoes = [
@@ -202,6 +202,7 @@ export default function CatiaChat() {
   const [isTyping, setIsTyping] = useState(false);
   const [conversaIniciada, setConversaIniciada] = useState(false);
 
+
   // Recupera usuário e créditos do Firestore
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (firebaseUser) => {
@@ -224,89 +225,9 @@ export default function CatiaChat() {
     }
   }, [mensagens, isTyping]);
 
-  // Função para salvar conversa no Firebase
-  const salvarConversaNoFirebase = useCallback(async () => {
-    console.log('🔍 Tentando salvar conversa...');
-    console.log('User:', user?.uid);
-    console.log('Conversa iniciada:', conversaIniciada);
-    console.log('Total mensagens:', mensagens.length);
-    
-    if (!user || !conversaIniciada || mensagens.length <= 1) {
-      console.log('❌ Condições não atendidas para salvar');
-      return;
-    }
-    
-    try {
-      // Filtrar apenas mensagens reais (remover mensagem inicial da CatIA)
-      const mensagensReais = mensagens.slice(1);
-      
-      console.log('📝 Mensagens reais:', mensagensReais.length);
-      
-      if (mensagensReais.length === 0) {
-        console.log('❌ Nenhuma mensagem real para salvar');
-        return;
-      }
 
-      // Criar título baseado na primeira pergunta do usuário
-      const primeiraPergunta = mensagensReais.find(msg => msg.autor === 'usuario')?.texto || 'Conversa com CatIA';
-      const titulo = primeiraPergunta.length > 50 
-        ? primeiraPergunta.substring(0, 47) + '...' 
-        : primeiraPergunta;
 
-      console.log('📋 Título:', titulo);
 
-      // Dados a serem salvos
-      const dadosConversa = {
-        userId: user.uid,
-        titulo: titulo,
-        mensagens: mensagensReais.map(msg => ({
-          ...msg,
-          timestamp: new Date()
-        })),
-        dataInicio: new Date(Date.now() - (mensagensReais.length * 30000)), // Estimativa
-        dataFim: serverTimestamp(),
-        totalMensagens: mensagensReais.length
-      };
-
-      console.log('💾 Salvando no Firebase:', dadosConversa);
-
-      // Salvar no Firestore
-      const docRef = await addDoc(collection(db, 'conversas_catia'), dadosConversa);
-      
-      console.log('✅ Conversa salva com sucesso! ID:', docRef.id);
-    } catch (error) {
-      console.error('❌ Erro ao salvar conversa:', error);
-    }
-  }, [user, conversaIniciada, mensagens]);
-
-  // Salvar conversa quando sair da página
-  useEffect(() => {
-    const handleBeforeUnload = () => {
-      if (conversaIniciada && mensagens.length > 1) {
-        salvarConversaNoFirebase();
-      }
-    };
-
-    const handleVisibilityChange = () => {
-      if (document.hidden && conversaIniciada && mensagens.length > 1) {
-        salvarConversaNoFirebase();
-      }
-    };
-
-    // Event listeners para salvar quando sair
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    
-    return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-      
-      // Salvar também quando componente desmonta
-      if (conversaIniciada && mensagens.length > 1) {
-        salvarConversaNoFirebase();
-      }
-    };
-  }, [mensagens, user, conversaIniciada, salvarConversaNoFirebase]);
 
   // Envia mensagem do usuário e recebe resposta da CatIA
   async function enviarMensagem(e, textoSugestao) {
@@ -336,33 +257,13 @@ export default function CatiaChat() {
     });
 
     try {
-      // Pegar TODAS as mensagens da conversa atual (sem a inicial da CatIA)
-      const mensagensReais = mensagens.slice(1); // Remove mensagem inicial
-      const mensagensParaHistorico = [...mensagensReais, { autor: "usuario", texto }];
-      
-      const historico = mensagensParaHistorico.map((msg, index) => ({
-        autor: msg.autor === 'usuario' ? 'Usuário' : 'CatIA',
-        texto: msg.texto,
-        ordem: index + 1
-      }));
-
-      console.log('📚 Histórico COMPLETO enviado:', historico);
-      console.log('📊 Total de mensagens no histórico:', historico.length);
 
       const response = await fetch(N8N_WEBHOOK_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           pergunta: texto,
-          userId: user?.uid || "anonimo",
-          historico: historico,
-          isNewConversation: mensagens.length === 1,
-          totalMensagensNaConversa: mensagens.length,
-          debug: {
-            mensagensOriginais: mensagens.length,
-            mensagensReais: mensagensReais.length,
-            historicoEnviado: historico.length
-          }
+          userId: user?.uid || "anonimo"
         })
       });
 
@@ -383,13 +284,14 @@ export default function CatiaChat() {
         setIsTyping(false); // Para indicador em caso de erro
         return;
       }
-         // ✅ Aqui está o que faltava
+         // ✅ Resposta do N8N (agora com memória nativa)
     if (data && data.output) {
         setMensagens(msgs => [
           ...msgs,
           { autor: "catia", texto: data.output }
         ]);
-        setIsTyping(false); // Corrige o loop da animação
+        setIsTyping(false);
+        
         // Vibração ao receber resposta
         if ("vibrate" in navigator) {
           navigator.vibrate(50);
@@ -399,7 +301,7 @@ export default function CatiaChat() {
           ...msgs,
           { autor: "catia", texto: "Desculpe, não consegui responder agora." }
         ]);
-        setIsTyping(false); // Corrige o loop da animação
+        setIsTyping(false);
       }
 
 
@@ -493,17 +395,7 @@ export default function CatiaChat() {
               autoFocus
               disabled={isTyping}
             />
-            {/* Botão temporário para testar salvamento */}
-            {conversaIniciada && mensagens.length > 1 && (
-              <button
-                type="button"
-                onClick={salvarConversaNoFirebase}
-                className="bg-green-500 hover:bg-green-600 text-white rounded-full p-3 shadow transition mr-2"
-                title="Salvar conversa (teste)"
-              >
-                💾
-              </button>
-            )}
+
             
             <button
               type="submit"

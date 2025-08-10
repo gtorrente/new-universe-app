@@ -90,7 +90,7 @@ const CheckoutPagamento = () => {
               creditCard: 'all',
               debitCard: 'all',
               ticket: 'all',
-              bankTransfer: 'all',
+              bankTransfer: 'pix', // força exibição do PIX
               mercadoPago: 'all',
             },
             visual: {
@@ -154,7 +154,8 @@ const CheckoutPagamento = () => {
       });
 
       // BACKEND REAL HABILITADO
-      const response = await fetch('https://api.torrente.com.br/api/mercado-pago/create-preference', {
+      const apiBase = import.meta.env.VITE_BACKEND_API_URL || import.meta.env.VITE_ASTRO_API_URL || 'http://localhost:3001';
+      const response = await fetch(`${apiBase}/api/mercado-pago/create-preference`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -174,13 +175,13 @@ const CheckoutPagamento = () => {
             package_id: packageData.id,
             credits: packageData.credits,
           },
-          notification_url: `https://api.torrente.com.br/api/mercado-pago/webhook`,
+          notification_url: `${apiBase}/api/mercado-pago/webhook`,
+          // Em dev (http://localhost), o backend vai ignorar auto_return
           back_urls: {
             success: `${window.location.origin}/pagamento-sucesso`,
             failure: `${window.location.origin}/pagamento-falha`,
             pending: `${window.location.origin}/pagamento-pendente`,
           },
-          auto_return: 'approved',
         }),
       });
 
@@ -219,7 +220,8 @@ const CheckoutPagamento = () => {
 
       console.log('📤 Enviando dados para Node-RED:', paymentData);
 
-      const response = await fetch('https://api.torrente.com.br/api/mercado-pago/process-payment', {
+      const apiBase = import.meta.env.VITE_BACKEND_API_URL || import.meta.env.VITE_ASTRO_API_URL || 'http://localhost:3001';
+      const response = await fetch(`${apiBase}/api/mercado-pago/process-payment`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

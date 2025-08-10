@@ -8,15 +8,22 @@
     "dev": "nodemon server.js"
   },
   "dependencies": {
-    "express": "^4.18.2",
     "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "firebase-admin": "^12.0.0",
+    "luxon": "^3.7.1",
     "mercadopago": "^2.0.11",
-    "firebase-admin": "^12.0.0"
+    "swisseph": "^0.5.17"
   },
   "devDependencies": {
     "nodemon": "^3.0.2"
   },
-  "keywords": ["mercadopago", "pagamentos", "api", "universo-catia"],
+  "keywords": [
+    "mercadopago",
+    "pagamentos",
+    "api",
+    "universo-catia"
+  ],
   "author": "Universo Catia",
   "license": "MIT"
-} 
+}

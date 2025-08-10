@@ -5,7 +5,7 @@ import ScrollToTop from './components/ScrollToTop'
 
 import Home from './pages/Home'
 import MapaAstral from './pages/MapaAstral'
-import Tarot from './pages/Tarot'
+import TarotContainer from './pages/TarotContainer'
 import Receitas from './pages/Receitas'
 import Perfil from './pages/Perfil'
 import Login from "./pages/Login";
@@ -26,6 +26,7 @@ import MinhasConversas from './pages/MinhasConversas';
 import Configuracoes from './pages/Configuracoes';
 import ComprarCreditos from './pages/ComprarCreditos';
 import CheckoutPagamento from './pages/CheckoutPagamento';
+import CapituloAstrologico from './pages/CapituloAstrologico';
 
 import BottomNav from './components/BottomNav'
 
@@ -57,10 +58,18 @@ export default function App() {
             }
           />
           <Route
+            path="/mapa-astral/capitulo/:planeta/:signo"
+            element={
+              <ProtectedRoute>
+                <CapituloAstrologico />
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/tarot"
             element={
               <ProtectedRoute>
-                <Tarot />
+                <TarotContainer />
               </ProtectedRoute>
             }
           />
