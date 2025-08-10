@@ -24,6 +24,10 @@ function computeAscEqualHouses(utc, latDeg, lonDeg){
   return { ascDeg, cusps };
 }
 
+
+
+
+
 // Promisify helpers para API callback-based do swisseph
 function sweHouses(jdut, lat, lon, hsys) {
   return new Promise((resolve, reject) => {
@@ -390,6 +394,9 @@ app.get('/api/mercado-pago/payment-status/:id', async (req, res) => {
     res.status(500).json({ error: 'Erro interno do servidor' });
   }
 });
+
+app.get('/healthz', (req, res) => res.status(200).send('ok'));
+
 
 app.listen(PORT, () => {
   console.log(`🚀 Servidor rodando na porta ${PORT}`);
