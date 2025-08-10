@@ -1,0 +1,33 @@
+# backend-exemplo/Dockerfile
+FROM node:20-slim
+
+# Pacotes necessários para compilar dependências nativas (swisseph) e healthcheck
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3 build-essential tzdata ca-certificates curl \
+ && rm -rf /var/lib/apt/lists/*
+
+# Diretório da app
+WORKDIR /app
+
+# Copia manifestos e instala só deps de produção
+COPY package*.json ./
+ENV NODE_ENV=production
+RUN npm ci --omit=dev
+
+# Copia o restante do código
+COPY . .
+
+# Segurança: roda como user sem privilégios
+RUN useradd -ms /bin/bash nodeapp && chown -R nodeapp:nodeapp /app
+USER nodeapp
+
+# Porta padrão do seu server.js
+ENV PORT=3001
+EXPOSE 3001
+
+# Healthcheck (ajusta a rota se preferir)
+HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
+  CMD curl -fsS http://127.0.0.1:${PORT}/api/mercado-pago/payment-status/health || exit 1
+
+# Inicia a aplicação
+CMD ["npm", "start"]

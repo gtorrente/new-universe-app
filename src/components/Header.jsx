@@ -17,7 +17,8 @@ export default function Header({ user, creditos, isWhiteText = false }) {
     notificacoes, 
     novasNotificacoes, 
     marcarComoVista, 
-    marcarTodasComoVistas 
+    marcarTodasComoVistas,
+    deletarNotificacao 
   } = useNotificacoes();
 
   // Fecha o menu ao clicar fora
@@ -119,6 +120,7 @@ export default function Header({ user, creditos, isWhiteText = false }) {
           marcarTodasComoVistas();
           setShowNotificacoes(false);
         }}
+        onDeletarNotificacao={deletarNotificacao}
       />
     </header>
   );

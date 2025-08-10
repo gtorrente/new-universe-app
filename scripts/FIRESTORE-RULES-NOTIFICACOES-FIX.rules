@@ -1,0 +1,35 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Função helper para verificar se é admin
+    function isAdmin() {
+      return request.auth != null && 
+        get(/databases/$(database)/documents/usuarios/$(request.auth.uid)).data.isAdmin == true;
+    }
+    
+    // REGRA CRÍTICA: Notificações com permissão total para admin
+    match /notificacoes/{document} {
+      allow read: if request.auth != null;
+      allow update: if request.auth != null; // Para incrementar visualizações
+      allow write, create, delete: if isAdmin();
+    }
+    
+    // Usuários
+    match /usuarios/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow read, write: if isAdmin();
+      allow create: if request.auth != null;
+    }
+    
+    // REGRA TEMPORÁRIA PARA TESTE: Permissão total para admin
+    match /{document=**} {
+      allow read, write, create, update, delete: if isAdmin();
+    }
+    
+    // Regra padrão: negado
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

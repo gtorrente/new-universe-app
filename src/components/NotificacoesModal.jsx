@@ -2,14 +2,15 @@
 // Mostra lista de notificações ativas com links acionáveis
 
 import { useNavigate } from 'react-router-dom';
-import { FaTimes, FaExternalLinkAlt, FaCheckDouble } from 'react-icons/fa';
+import { FaTimes, FaExternalLinkAlt, FaCheckDouble, FaTrash } from 'react-icons/fa';
 
 export default function NotificacoesModal({ 
   isOpen, 
   onClose, 
   notificacoes, 
   onNotificacaoClick,
-  onMarcarTodasVistas
+  onMarcarTodasVistas,
+  onDeletarNotificacao
 }) {
   const navigate = useNavigate();
 
@@ -23,6 +24,16 @@ export default function NotificacoesModal({
     if (notificacao.link_acionavel) {
       navigate(notificacao.link_acionavel);
       onClose(); // Fechar modal após navegação
+    }
+  };
+
+  const handleDeletarNotificacao = async (notificacaoId, event) => {
+    event.stopPropagation(); // Evitar trigger do click da notificação
+    
+    try {
+      await onDeletarNotificacao(notificacaoId);
+    } catch (error) {
+      alert('Erro ao deletar notificação. Você precisa de permissões de administrador.');
     }
   };
 
@@ -120,7 +131,15 @@ export default function NotificacoesModal({
                         <h4 className="font-semibold text-gray-900 text-sm leading-tight">
                           {notificacao.titulo}
                         </h4>
-                        <div className="flex items-center gap-1 ml-2">
+                        <div className="flex items-center gap-2 ml-2">
+                          {/* Botão de deletar */}
+                          <button
+                            onClick={(e) => handleDeletarNotificacao(notificacao.id, e)}
+                            className="p-1 text-gray-400 hover:text-red-500 transition opacity-0 group-hover:opacity-100"
+                            title="Deletar notificação"
+                          >
+                            <FaTrash size={12} />
+                          </button>
                           {notificacao.link_acionavel && (
                             <FaExternalLinkAlt size={12} className="text-gray-400" />
                           )}

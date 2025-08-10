@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { db } from '../../firebaseConfigFront';
-import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, serverTimestamp, query, orderBy } from 'firebase/firestore';
+import { collection, getDocs, addDoc, updateDoc, setDoc, doc, getDoc, serverTimestamp, query, orderBy } from 'firebase/firestore';
 import { 
   FaArrowLeft, 
   FaBell, 
@@ -76,16 +76,55 @@ export default function NotificationsAdmin() {
 
   const loadNotifications = async () => {
     try {
-      const notificationsSnap = await getDocs(
-        query(collection(db, 'notificacoes'), orderBy('createdAt', 'desc'))
-      );
+      console.log('🔄 Carregando notificações...');
+      
+      // Forçar cache refresh usando source: 'server'
+      let notificationsSnap;
+      try {
+        // Usar 'source: server' para forçar busca no servidor, não no cache
+        notificationsSnap = await getDocs(
+          query(
+            collection(db, 'notificacoes'),
+            orderBy('createdAt', 'desc')
+          ),
+          { source: 'server' }
+        );
+      } catch (orderError) {
+        console.warn('⚠️ Erro com orderBy, tentando sem ordenação:', orderError);
+        // Fallback: buscar sem ordenação, mas ainda forçando servidor
+        notificationsSnap = await getDocs(
+          collection(db, 'notificacoes'),
+          { source: 'server' }
+        );
+      }
+      
       const notificationsData = notificationsSnap.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
       }));
-      setNotifications(notificationsData);
+      
+      // Filtrar somente ativa !== false (soft delete esconde itens)
+      const activeOnly = notificationsData.filter(n => n.ativa !== false && n.status !== 'deletada');
+
+      // LOG DETALHADO dos IDs para debug
+      console.log('📋 IDs encontrados (todos):', notificationsData.map(n => n.id));
+      console.log('📋 IDs ativos:', activeOnly.map(n => n.id));
+      
+      // Ordenar manualmente se necessário
+      activeOnly.sort((a, b) => {
+        const dateA = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(a.createdAt || 0);
+        const dateB = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(b.createdAt || 0);
+        return dateB - dateA; // Mais recentes primeiro
+      });
+      
+      console.log(`✅ ${activeOnly.length} notificações ativas carregadas (fonte: servidor)`);
+      setNotifications(activeOnly);
+      
     } catch (error) {
-      console.error('Erro ao carregar notificações:', error);
+      console.error('❌ Erro ao carregar notificações:', error);
+      console.error('Código:', error.code);
+      console.error('Mensagem:', error.message);
+      setNotifications([]); // Limpar em caso de erro
     }
   };
 
@@ -116,11 +155,7 @@ export default function NotificationsAdmin() {
 
   const handleSaveNotification = async () => {
     try {
-      // Gerar ID único se for nova notificação
-      const id = editingNotification?.id || `notificacao_${Date.now()}`;
-      
       const notificationData = {
-        id,
         titulo: form.titulo,
         mensagem: form.mensagem,
         tipo: form.tipo,
@@ -131,16 +166,20 @@ export default function NotificationsAdmin() {
         icone: form.icone,
         prioridade: form.prioridade,
         visibilidade: form.visibilidade,
-        createdAt: editingNotification?.createdAt || serverTimestamp(),
         updatedAt: serverTimestamp(),
         visualizacoes: editingNotification?.visualizacoes || 0,
         cliques: editingNotification?.cliques || 0
       };
 
       if (editingNotification) {
+        // Atualizar notificação existente
         await updateDoc(doc(db, 'notificacoes', editingNotification.id), notificationData);
+        console.log('✅ Notificação atualizada:', editingNotification.id);
       } else {
-        await addDoc(collection(db, 'notificacoes'), notificationData);
+        // Criar nova notificação (Firebase gera ID automaticamente)
+        notificationData.createdAt = serverTimestamp();
+        const docRef = await addDoc(collection(db, 'notificacoes'), notificationData);
+        console.log('✅ Nova notificação criada:', docRef.id);
       }
 
       await loadNotifications();
@@ -159,22 +198,78 @@ export default function NotificationsAdmin() {
         visibilidade: 'badge_e_popup'
       });
       
-      alert(editingNotification ? 'Notificação atualizada!' : 'Notificação criada!');
+      alert(editingNotification ? 'Notificação atualizada com sucesso!' : 'Notificação criada com sucesso!');
     } catch (error) {
-      console.error('Erro ao salvar notificação:', error);
-      alert('Erro ao salvar notificação.');
+      console.error('❌ Erro ao salvar notificação:', error);
+      console.error('Código do erro:', error.code);
+      console.error('Mensagem do erro:', error.message);
+      
+      if (error.code === 'permission-denied') {
+        alert('Erro: Você não tem permissão para salvar notificações. Verifique se você é admin.');
+      } else {
+        alert(`Erro ao salvar notificação: ${error.message}`);
+      }
     }
   };
 
   const handleDeleteNotification = async (id, titulo) => {
     if (window.confirm(`Deletar notificação "${titulo}"?`)) {
       try {
-        await deleteDoc(doc(db, 'notificacoes', id));
+        console.log('🗑️ Tentando deletar notificação:', id);
+        console.log('📊 IDs antes da deleção:', notifications.map(n => n.id));
+        
+        // 1. Remover otimisticamente da UI primeiro
+        setNotifications(prevNotifications => {
+          const filtered = prevNotifications.filter(notif => notif.id !== id);
+          console.log('🎯 Removido otimisticamente. Restam:', filtered.length);
+          return filtered;
+        });
+        
+        // 2. Soft delete no Firebase
+        const ref = doc(db, 'notificacoes', id);
+        try {
+          await updateDoc(ref, { ativa: false, status: 'deletada', deletedAt: serverTimestamp() });
+          console.log('✅ Soft delete aplicado (updateDoc)');
+        } catch (updateErr) {
+          if (updateErr?.code === 'not-found') {
+            console.warn('⚠️ Documento não existe para update. Criando tombstone via setDoc...');
+            await setDoc(ref, { ativa: false, status: 'deletada', deletedAt: serverTimestamp() }, { merge: true });
+            console.log('✅ Tombstone criado com setDoc (merge)');
+          } else {
+            throw updateErr;
+          }
+        }
+        
+        // 3. Verificar se flag foi aplicada no servidor
+        try {
+          const snap = await getDoc(ref);
+          const data = snap.data();
+          console.log('🔎 Pós-soft-delete no servidor:', { existe: snap.exists(), ativa: data?.ativa, status: data?.status });
+        } catch (e) {
+          console.warn('⚠️ Não foi possível ler pós-soft-delete (pode ser regra). Prosseguindo.', e?.code || e?.message);
+        }
+        
+        // 4. Recarregar lista (filtra ativa=false)
+        console.log('🔄 Recarregando lista após soft delete...');
         await loadNotifications();
-        alert('Notificação deletada!');
+        
+        alert('Notificação deletada (soft delete) com sucesso!');
+        
       } catch (error) {
-        console.error('Erro ao deletar:', error);
-        alert('Erro ao deletar notificação.');
+        console.error('❌ Erro ao deletar notificação:', error);
+        console.error('Código do erro:', error.code);
+        console.error('Mensagem do erro:', error.message);
+        
+        // Reverter remoção otimística em caso de erro
+        await loadNotifications();
+        
+        if (error.code === 'permission-denied') {
+          alert('Erro: Você não tem permissão para deletar notificações. Verifique se você é admin.');
+        } else if (error.code === 'not-found') {
+          alert('Erro: Notificação não encontrada.');
+        } else {
+          alert(`Erro ao deletar notificação: ${error.message}`);
+        }
       }
     }
   };

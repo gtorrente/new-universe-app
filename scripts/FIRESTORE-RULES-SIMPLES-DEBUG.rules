@@ -1,0 +1,13 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // REGRA TEMPORÁRIA DE DEBUG: Permitir tudo para usuários autenticados
+    match /{document=**} {
+      allow read, write, create, update, delete: if request.auth != null;
+    }
+    
+    // Se isso funcionar, o problema é na função isAdmin()
+    // Se não funcionar, é problema de autenticação
+  }
+}

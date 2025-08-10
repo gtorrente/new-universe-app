@@ -2,7 +2,7 @@
 // Busca notificações ativas, controla visualizações e badge
 
 import { useState, useEffect, useCallback } from 'react';
-import { collection, query, where, getDocs, doc, updateDoc, orderBy } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, updateDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { db, auth } from '../firebaseConfigFront';
 
 export function useNotificacoes() {
@@ -29,16 +29,23 @@ export function useNotificacoes() {
     try {
       console.log('🔔 Buscando notificações para:', user.uid);
       
-      const q = query(
-        collection(db, 'notificacoes'),
-        where('ativa', '==', true)
-      );
-      
-      const snapshot = await getDocs(q);
-      const notificacoesData = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
+      // Buscar notificações e ocultas em paralelo
+      const [notifsSnap, ocultasSnap] = await Promise.all([
+        getDocs(
+          query(
+            collection(db, 'notificacoes'),
+            where('ativa', '!=', false)
+          )
+        ),
+        getDocs(collection(db, 'usuarios', user.uid, 'notificacoes_ocultas'))
+      ]);
+
+      const ocultasIds = new Set(ocultasSnap.docs.map(d => d.id));
+
+      const notificacoesData = notifsSnap.docs.map(docSnap => ({
+        id: docSnap.id,
+        ...docSnap.data()
+      })).filter(n => !ocultasIds.has(n.id));
 
       // Filtrar notificações por público-alvo
       const notificacoesFiltradas = notificacoesData.filter(notif => {
@@ -113,30 +120,63 @@ export function useNotificacoes() {
     }
   }, [user, notificacoes]);
 
-  // Marcar todas como vistas
+  // Marcar todas como vistas E ocultar para o usuário (somem da lista)
   const marcarTodasComoVistas = useCallback(async () => {
     if (!user || notificacoes.length === 0) return;
     
     try {
       const visualizadas = JSON.parse(localStorage.getItem(`notif_vistas_${user.uid}`) || '[]');
-      const novasIds = notificacoes
-        .filter(notif => !visualizadas.includes(notif.id))
-        .map(notif => notif.id);
-      
-      if (novasIds.length > 0) {
-        // Atualizar localStorage
-        const todasVisualizadas = [...visualizadas, ...novasIds];
-        localStorage.setItem(`notif_vistas_${user.uid}`, JSON.stringify(todasVisualizadas));
-        
-        // Zerar contador
-        setNovasNotificacoes(0);
-        
-        console.log(`✅ ${novasIds.length} notificações marcadas como vistas`);
-      }
+      const idsTodas = notificacoes.map(notif => notif.id);
+      // Atualizar localStorage com todas como vistas
+      const todasVisualizadas = [...new Set([...visualizadas, ...idsTodas])];
+      localStorage.setItem(`notif_vistas_${user.uid}`, JSON.stringify(todasVisualizadas));
+
+      // Ocultar todas para este usuário (soft delete por usuário)
+      await Promise.all(
+        idsTodas.map(id => {
+          const ocultarRef = doc(db, 'usuarios', user.uid, 'notificacoes_ocultas', id);
+          return setDoc(ocultarRef, { ocultadaEm: serverTimestamp() }, { merge: true });
+        })
+      );
+
+      // Atualizar estado local: esvaziar lista e zera contador
+      setNotificacoes([]);
+      setNovasNotificacoes(0);
+
+      console.log(`✅ ${idsTodas.length} notificações marcadas como vistas e ocultadas para o usuário`);
     } catch (error) {
-      console.error('❌ Erro ao marcar todas como vistas:', error);
+      console.error('❌ Erro ao marcar todas como vistas/ocultar:', error);
     }
   }, [user, notificacoes]);
+
+  // Ocultar notificação para este usuário (soft delete por usuário)
+  const deletarNotificacao = useCallback(async (notificacaoId) => {
+    if (!user) return;
+    
+    try {
+      // Marcar como oculta em subcoleção do usuário
+      const ocultarRef = doc(db, 'usuarios', user.uid, 'notificacoes_ocultas', notificacaoId);
+      await setDoc(ocultarRef, { ocultadaEm: serverTimestamp() }, { merge: true });
+
+      // Remover do estado local
+      setNotificacoes(prev => prev.filter(notif => notif.id !== notificacaoId));
+      
+      // Remover do localStorage de visualizadas
+      const visualizadas = JSON.parse(localStorage.getItem(`notif_vistas_${user.uid}`) || '[]');
+      const novasVisualizadas = visualizadas.filter(id => id !== notificacaoId);
+      localStorage.setItem(`notif_vistas_${user.uid}`, JSON.stringify(novasVisualizadas));
+      
+      // Atualizar contador se era uma notificação não vista
+      if (!visualizadas.includes(notificacaoId)) {
+        setNovasNotificacoes(prev => Math.max(0, prev - 1));
+      }
+      
+      console.log('✅ Notificação ocultada para o usuário:', notificacaoId);
+    } catch (error) {
+      console.error('❌ Erro ao deletar notificação:', error);
+      throw error; // Re-throw para o componente mostrar erro
+    }
+  }, [user]);
 
   // Buscar notificações quando usuário muda
   useEffect(() => {
@@ -159,6 +199,7 @@ export function useNotificacoes() {
     loading,
     marcarComoVista,
     marcarTodasComoVistas,
+    deletarNotificacao,
     refresh: buscarNotificacoes
   };
 }
