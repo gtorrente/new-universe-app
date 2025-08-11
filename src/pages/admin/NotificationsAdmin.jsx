@@ -103,12 +103,18 @@ export default function NotificationsAdmin() {
         ...doc.data()
       }));
       
-      // Filtrar somente ativa !== false (soft delete esconde itens)
-      const activeOnly = notificationsData.filter(n => n.ativa !== false && n.status !== 'deletada');
+      // Filtrar somente notificações ativas (mais rigoroso)
+      const activeOnly = notificationsData.filter(n => {
+        const isActive = n.ativa !== false && n.status !== 'deletada';
+        if (!isActive) {
+          console.log(`🗑️ Filtrando notificação deletada: ${n.id} (ativa: ${n.ativa}, status: ${n.status})`);
+        }
+        return isActive;
+      });
 
       // LOG DETALHADO dos IDs para debug
-      console.log('📋 IDs encontrados (todos):', notificationsData.map(n => n.id));
-      console.log('📋 IDs ativos:', activeOnly.map(n => n.id));
+      console.log('📋 IDs encontrados (todos):', notificationsData.map(n => `${n.id} (ativa: ${n.ativa}, status: ${n.status})`));
+      console.log('📋 IDs ativos após filtro:', activeOnly.map(n => n.id));
       
       // Ordenar manualmente se necessário
       activeOnly.sort((a, b) => {
@@ -233,7 +239,13 @@ export default function NotificationsAdmin() {
         } catch (updateErr) {
           if (updateErr?.code === 'not-found') {
             console.warn('⚠️ Documento não existe para update. Criando tombstone via setDoc...');
-            await setDoc(ref, { ativa: false, status: 'deletada', deletedAt: serverTimestamp() }, { merge: true });
+            await setDoc(ref, { 
+              ativa: false, 
+              status: 'deletada', 
+              deletedAt: serverTimestamp(),
+              titulo: titulo || 'Notificação removida',
+              motivo: 'Documento inexistente - corrigido via tombstone'
+            }, { merge: true });
             console.log('✅ Tombstone criado com setDoc (merge)');
           } else {
             throw updateErr;
@@ -445,28 +457,41 @@ export default function NotificationsAdmin() {
           <div className="px-6 py-4 border-b border-gray-200">
             <div className="flex justify-between items-center">
               <h2 className="text-xl font-bold text-gray-900">Notificações Push</h2>
-              <button
-                onClick={() => {
-                  setEditingNotification(null);
-                  setForm({
-                    titulo: '',
-                    mensagem: '',
-                    tipo: 'geral',
-                    publico: 'todos',
-                    agendamento: '',
-                    ativa: true,
-                    link_acionavel: '',
-                    icone: '🔔',
-                    prioridade: 'normal',
-                    visibilidade: 'badge_e_popup'
-                  });
-                  setShowModal(true);
-                }}
-                className="flex items-center gap-2 px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition"
-              >
-                <FaPlus />
-                Nova Notificação
-              </button>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => {
+                    console.log('🔄 Forçando refresh das notificações...');
+                    setLoading(true);
+                    loadNotifications().finally(() => setLoading(false));
+                  }}
+                  className="flex items-center gap-2 px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition"
+                  title="Recarregar lista e limpar cache"
+                >
+                  🔄 Refresh
+                </button>
+                <button
+                  onClick={() => {
+                    setEditingNotification(null);
+                    setForm({
+                      titulo: '',
+                      mensagem: '',
+                      tipo: 'geral',
+                      publico: 'todos',
+                      agendamento: '',
+                      ativa: true,
+                      link_acionavel: '',
+                      icone: '🔔',
+                      prioridade: 'normal',
+                      visibilidade: 'badge_e_popup'
+                    });
+                    setShowModal(true);
+                  }}
+                  className="flex items-center gap-2 px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition"
+                >
+                  <FaPlus />
+                  Nova Notificação
+                </button>
+              </div>
             </div>
           </div>
 

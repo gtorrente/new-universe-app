@@ -509,6 +509,7 @@ export default function MapaAstral() {
   const coordenadasRef = useRef(null);
   const [planetTooltip, setPlanetTooltip] = useState(null); // { left, top, title, text }
   const [isPremiumModalOpen, setPremiumModalOpen] = useState(false);
+  const [isNewConsultation, setIsNewConsultation] = useState(false); // Flag para nova consulta
   const openPremiumModal = () => setPremiumModalOpen(true);
   const closePremiumModal = () => setPremiumModalOpen(false);
   const handleSubscribe = () => {
@@ -540,7 +541,7 @@ export default function MapaAstral() {
 
   // Garantir que, ao abrir no step 2 sem chart, tentamos carregar do localStorage
   useEffect(() => {
-    if (step === 2 && !chart) {
+    if (step === 2 && !chart && !isNewConsultation) {
       const raw = localStorage.getItem('mapAstralChart');
       const savedCidade = localStorage.getItem('mapAstralCidade');
       if (raw) {
@@ -557,7 +558,7 @@ export default function MapaAstral() {
         }
       }
     }
-  }, [step, chart]);
+  }, [step, chart, isNewConsultation]);
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (firebaseUser) => {
@@ -584,7 +585,7 @@ export default function MapaAstral() {
   // Effect separado para carregar mapa astral salvo
   useEffect(() => {
     const loadSavedChart = async () => {
-      if (!user) return;
+      if (!user || isNewConsultation) return; // Não carrega se é nova consulta
       
       const stepParam = searchParams.get('step');
       // Só carrega se não há step na URL e não há chart atual
@@ -615,7 +616,7 @@ export default function MapaAstral() {
     };
 
     loadSavedChart();
-  }, [user, searchParams, chart]);
+  }, [user, searchParams, chart, isNewConsultation]);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -991,17 +992,47 @@ export default function MapaAstral() {
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                onClick={() => {
-                  // Limpar dados para nova consulta
+                onClick={async () => {
+                  console.log('🔄 Nova consulta iniciada');
+                  
+                  // Marcar como nova consulta para evitar recarregamento automático
+                  setIsNewConsultation(true);
+                  
+                  // Limpar dados locais
                   setBirthDate('');
                   setBirthTime('');
                   setCidade('');
                   setCoordenadas(null);
+                  coordenadasRef.current = null;
                   setChart(null);
                   setError(null);
+                  setPlanetTooltip(null);
+                  
+                  // Limpar localStorage
                   localStorage.removeItem('mapAstralChart');
                   localStorage.removeItem('mapAstralCidade');
+                  
+                  // Limpar dados salvos no Firebase
+                  if (user) {
+                    try {
+                      await setDoc(
+                        doc(db, "mapas_astrais", user.uid),
+                        { status: 'cleared', clearedAt: new Date() },
+                        { merge: false } // Substitui o documento completamente
+                      );
+                      console.log('✅ Dados do Firebase limpos');
+                    } catch (error) {
+                      console.error('❌ Erro ao limpar dados do Firebase:', error);
+                    }
+                  }
+                  
+                  // Ir para o formulário
                   setStep(1);
+                  
+                  // Resetar a flag após um pequeno delay
+                  setTimeout(() => {
+                    setIsNewConsultation(false);
+                  }, 1000);
                 }}
                 className="px-6 py-4 rounded-2xl font-bold text-lg bg-white/20 backdrop-blur-md text-white border border-white/30 hover:bg-white/30 transition font-neue-bold"
               >
