@@ -1,0 +1,37 @@
+// 🚨 REGRAS DO FIRESTORE - MODO DESENVOLVIMENTO (TOTALMENTE ABERTO)
+// ⚠️  ATENÇÃO: Essas regras permitem acesso total a todos os dados
+// ⚠️  NÃO usar em produção - apenas para desenvolvimento/testes
+// 
+// Para aplicar:
+// 1. Firebase Console > Firestore Database > Rules
+// 2. Copie e cole essas regras
+// 3. Clique "Publish"
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // 🔓 ACESSO TOTAL A TUDO - MODO DESENVOLVIMENTO
+    match /{document=**} {
+      allow read, write, create, update, delete: if true;
+    }
+    
+  }
+}
+
+// 📝 EXPLICAÇÃO:
+// - {document=**} = Qualquer documento/subcoleção
+// - if true = Sempre permite
+// - read, write, create, update, delete = Todas as operações
+// 
+// 🎯 RESULTADO:
+// ✅ Horóscopos podem ser salvos
+// ✅ Scripts funcionam sem erro de permissão  
+// ✅ Frontend acessa todos os dados
+// ✅ Admin funciona totalmente
+// ✅ Notificações podem ser criadas/editadas/deletadas
+// ✅ Usuários podem fazer qualquer operação
+//
+// 🔒 PARA PRODUÇÃO:
+// Quando for para produção, substituir por regras restritivas
+// baseadas em autenticação e roles específicos

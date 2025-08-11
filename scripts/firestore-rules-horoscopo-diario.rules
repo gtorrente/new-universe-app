@@ -1,0 +1,57 @@
+// Regras do Firestore para Horóscopo Diário
+// Adicione estas regras no Firebase Console > Firestore Database > Rules
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ========================================
+    // HORÓSCOPOS DIÁRIOS - PERMISSÕES ABERTAS
+    // ========================================
+    
+    // Coleção de horóscopos diários - leitura para todos, escrita para admins
+    match /horoscopo_diario/{dataISO} {
+      allow read: if true; // Todos podem ler
+      allow write: if isAdmin(); // Só admins podem escrever
+      
+      // Subcoleção de signos
+      match /{signo}/{document=**} {
+        allow read: if true; // Todos podem ler
+        allow write: if isAdmin(); // Só admins podem escrever
+      }
+    }
+    
+    // Coleção alternativa (caso use path diferente)
+    match /horoscopos_diarios/{dataISO} {
+      allow read: if true; // Todos podem ler
+      allow write: if isAdmin(); // Só admins podem escrever
+      
+      // Subcoleção de signos
+      match /{signo}/{document=**} {
+        allow read: if true; // Todos podem ler
+        allow write: if isAdmin(); // Só admins podem escrever
+      }
+      
+      // Config/status
+      match /config/{document=**} {
+        allow read: if true;
+        allow write: if isAdmin();
+      }
+    }
+    
+    // ========================================
+    // FUNÇÃO AUXILIAR
+    // ========================================
+    
+    // Função para verificar se é admin
+    function isAdmin() {
+      return request.auth != null && 
+             request.auth.uid != null &&
+             get(/databases/$(database)/documents/usuarios/$(request.auth.uid)).data.isAdmin == true;
+    }
+    
+    // Suas outras regras existentes...
+    // (manter todas as regras que já existem)
+    
+  }
+}

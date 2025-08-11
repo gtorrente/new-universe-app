@@ -675,8 +675,7 @@ export default function MapaAstral() {
       const result = {
         positions,
         houses: natal.casas || [],
-        // Oculto temporariamente: ascendente (API externa pendente)
-        ascendant: null,
+        ascendant: natal.ascendant, // ✅ Reativado - AstrologyAPI funcionando
       };
 
       setChart(result);
@@ -848,23 +847,48 @@ export default function MapaAstral() {
               />
             </motion.div>
 
-            {/* Informações principais (cards maiores) */}
+            {/* Informações principais (3 cards na mesma linha) */}
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.8, duration: 0.6 }}
               className="mt-8 text-center z-10"
             >
-              <div className="bg-white/10 backdrop-blur-md rounded-3xl p-8 md:p-10 border border-white/20 max-w-5xl w-full mx-auto">
-                <div className="grid grid-cols-1 gap-10 items-center justify-items-center">
-                  <div>
-                    <span className="text-purple-200 text-sm font-medium">Signo Solar</span>
-                    <p className="text-white font-extrabold text-3xl md:text-4xl mt-1">
-                      {chart.positions?.Sol?.sign || 'Desconhecido'}
+              <div className="grid grid-cols-3 gap-3 sm:gap-6 max-w-6xl w-full mx-auto">
+                {/* Card Signo Solar */}
+                <div className="bg-white/10 backdrop-blur-md rounded-2xl sm:rounded-3xl p-3 sm:p-6 md:p-8 border border-white/20">
+                  <span className="text-purple-200 text-xs sm:text-sm font-medium">Signo Solar</span>
+                  <p className="text-white font-extrabold text-lg sm:text-2xl md:text-3xl mt-1 sm:mt-2">
+                    {chart.positions?.Sol?.sign || 'Desconhecido'}
+                  </p>
+                  <p className="text-purple-100/80 text-xs mt-1 sm:mt-2">
+                    Sua essência
+                  </p>
+                </div>
+
+                {/* Card Lua */}
+                <div className="bg-white/10 backdrop-blur-md rounded-2xl sm:rounded-3xl p-3 sm:p-6 md:p-8 border border-white/20">
+                  <span className="text-purple-200 text-xs sm:text-sm font-medium">Signo Lunar</span>
+                  <p className="text-white font-extrabold text-lg sm:text-2xl md:text-3xl mt-1 sm:mt-2">
+                    {chart.positions?.Lua?.sign || 'Desconhecido'}
+                  </p>
+                  <p className="text-purple-100/80 text-xs mt-1 sm:mt-2">
+                    Suas emoções
+                  </p>
+                </div>
+
+                {/* Card Ascendente */}
+                {chart.ascendant && (
+                  <div className="bg-white/10 backdrop-blur-md rounded-2xl sm:rounded-3xl p-3 sm:p-6 md:p-8 border border-white/20">
+                    <span className="text-purple-200 text-xs sm:text-sm font-medium">Ascendente</span>
+                    <p className="text-white font-extrabold text-lg sm:text-2xl md:text-3xl mt-1 sm:mt-2">
+                      {chart.ascendant.sign}
+                    </p>
+                    <p className="text-purple-100/80 text-xs mt-1 sm:mt-2">
+                      Sua imagem
                     </p>
                   </div>
-                  {/* Ascendente oculto temporariamente até ativarmos uma API precisa */}
-                </div>
+                )}
               </div>
             </motion.div>
 
@@ -928,15 +952,17 @@ export default function MapaAstral() {
                   );
                 })}
                 {/* Ascendente */}
-                <div className="grid grid-cols-3 items-center px-6 py-3 sm:py-4 text-white/90 text-center">
-                  <div className="flex items-center justify-center gap-2">
-                    <div className="w-7 h-7 rounded-full bg-white/10 border border-white/20 flex items-center justify-center">
-                      <span className="text-xs">Asc</span>
+                {chart.ascendant && (
+                  <div className="grid grid-cols-3 items-center px-6 py-3 sm:py-4 text-white/90 text-center">
+                    <div className="flex items-center justify-center gap-2">
+                      <div className="w-7 h-7 rounded-full bg-white/10 border border-white/20 flex items-center justify-center">
+                        <span className="text-xs">Asc</span>
+                      </div>
                     </div>
+                    <div>{chart.ascendant.sign}</div>
+                    <div>1</div>
                   </div>
-                  <div>{chart.ascendant?.sign || '—'}</div>
-                  <div>1</div>
-                </div>
+                )}
               </div>
             </div>
 
@@ -1033,16 +1059,21 @@ export default function MapaAstral() {
                   <h2 className="text-2xl font-bold mb-4 font-neue-bold">
                     Seu Perfil Astrológico
                   </h2>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div>
                       <span className="text-purple-200 text-sm">Signo Solar</span>
                       <p className="text-xl font-bold">{chart.positions?.Sol?.sign}</p>
                     </div>
-                    {/* Ascendente oculto temporariamente */}
                     <div>
                       <span className="text-purple-200 text-sm">Signo Lunar</span>
                       <p className="text-xl font-bold">{chart.positions?.Lua?.sign}</p>
                     </div>
+                    {chart.ascendant && (
+                      <div>
+                        <span className="text-purple-200 text-sm">Ascendente</span>
+                        <p className="text-xl font-bold">{chart.ascendant.sign}</p>
+                      </div>
+                    )}
                   </div>
                 </div>
               </motion.div>

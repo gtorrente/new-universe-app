@@ -1,5 +1,6 @@
 {
   "rewrites": [
+    { "source": "/api/astrology", "destination": "/api/astrology.js" },
     { "source": "/(.*)", "destination": "/" }
   ]
-} 
+}

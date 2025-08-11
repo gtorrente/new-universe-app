@@ -25,7 +25,7 @@ import Header from '../components/Header';
 import PremiumModal from "../components/PremiumModal";
 import { usePremiumModal } from "../hooks/usePremiumModal";
 import { auth, db } from '../firebaseConfigFront';
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, setDoc } from 'firebase/firestore';
 import HoroscopeCard from '../components/HoroscopeCard'
 import QuickAccessCard from '../components/QuickAccessCard'
 import PremiumBenefitsCarousel from '../components/PremiumBenefitsCarousel'
@@ -381,11 +381,13 @@ export default function Home() {
         } else {
           // Usuário completamente novo - criar documento com dados completos
           console.log("👤 Usuário completamente novo! Criando documento com 5 créditos");
-          await updateDoc(userRef, {
+          await setDoc(userRef, {
             nome: firebaseUser.displayName || "",
             email: firebaseUser.email || "",
             foto: firebaseUser.photoURL || "",
-            creditos: 5
+            creditos: 5,
+            criadoEm: new Date(),
+            ultimoLogin: new Date()
           });
           setCreditos(5);
           setShowModal(true);
