@@ -168,7 +168,8 @@ export async function fetchNatalChart({ dateISO, timezone, latitude, longitude }
     return {
       planetas,
       casas,
-      ascendant
+      ascendant,
+      utc: dateISO // Retornar a data/hora original para exibição
     };
     
   } catch (error) {
@@ -208,7 +209,8 @@ export async function fetchNatalChart({ dateISO, timezone, latitude, longitude }
     return {
       planetas,
       casas,
-      ascendant: { sign: 'Touro', degree: 48.5 }
+      ascendant: { sign: 'Touro', degree: 48.5 },
+      utc: dateISO // Retornar a data/hora mesmo no fallback
     };
   }
 }

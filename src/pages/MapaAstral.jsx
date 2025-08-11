@@ -676,6 +676,7 @@ export default function MapaAstral() {
         positions,
         houses: natal.casas || [],
         ascendant: natal.ascendant, // ✅ Reativado - AstrologyAPI funcionando
+        utc: natal.utc, // ✅ Incluir data/hora para exibição
       };
 
       setChart(result);
@@ -866,16 +867,7 @@ export default function MapaAstral() {
                   </p>
                 </div>
 
-                {/* Card Lua */}
-                <div className="bg-white/10 backdrop-blur-md rounded-2xl sm:rounded-3xl p-3 sm:p-6 md:p-8 border border-white/20">
-                  <span className="text-purple-200 text-xs sm:text-sm font-medium">Signo Lunar</span>
-                  <p className="text-white font-extrabold text-lg sm:text-2xl md:text-3xl mt-1 sm:mt-2">
-                    {chart.positions?.Lua?.sign || 'Desconhecido'}
-                  </p>
-                  <p className="text-purple-100/80 text-xs mt-1 sm:mt-2">
-                    Suas emoções
-                  </p>
-                </div>
+
 
                 {/* Card Ascendente */}
                 {chart.ascendant && (
@@ -889,6 +881,20 @@ export default function MapaAstral() {
                     </p>
                   </div>
                 )}
+
+
+               {/* Card Lua */}
+                                <div className="bg-white/10 backdrop-blur-md rounded-2xl sm:rounded-3xl p-3 sm:p-6 md:p-8 border border-white/20">
+                  <span className="text-purple-200 text-xs sm:text-sm font-medium">Signo Lunar</span>
+                  <p className="text-white font-extrabold text-lg sm:text-2xl md:text-3xl mt-1 sm:mt-2">
+                    {chart.positions?.Lua?.sign || 'Desconhecido'}
+                  </p>
+                  <p className="text-purple-100/80 text-xs mt-1 sm:mt-2">
+                    Suas emoções
+                  </p>
+                </div>
+
+
               </div>
             </motion.div>
 
