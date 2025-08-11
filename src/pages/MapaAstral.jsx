@@ -1070,20 +1070,16 @@ export default function MapaAstral() {
                       <span className="text-purple-200 text-sm">Signo Solar</span>
                       <p className="text-xl font-bold">{chart.positions?.Sol?.sign}</p>
                     </div>
-
                     {chart.ascendant && (
                       <div>
                         <span className="text-purple-200 text-sm">Ascendente</span>
                         <p className="text-xl font-bold">{chart.ascendant.sign}</p>
                       </div>
                     )}
-
-
                     <div>
                       <span className="text-purple-200 text-sm">Signo Lunar</span>
                       <p className="text-xl font-bold">{chart.positions?.Lua?.sign}</p>
                     </div>
-
                   </div>
                 </div>
               </motion.div>
